@@ -80,16 +80,7 @@ public class MainApp {
                         }
                         if (m == 0) {
                             System.out.println("eh bien aurevoir");
-//                            System.out.println("Voulez vous accéder à un autre menu? 1 pour oui, 0 pour non");
-//                            n=Lire.i();
-//                            if (n==1){
-//                                
-//                                u=Lire.c();
-//                            }
-//                            if (n==0){
-//                                
-//                                System.out.println("eh bien dégagez alors");
-//                            }
+                       
                         }
 
                     }
@@ -117,8 +108,9 @@ public class MainApp {
                         }
 
                         if (m == 2) {
-
-                            TrouveUtilisateurNom(con);
+                          System.out.println("entrez le nom de l'utilisateur recherché");
+                          String nomuser = Lire.S();
+                          TrouveUtilisateurNom(con, nomuser);
                         }
 
                         if (m == 3) {
@@ -159,13 +151,15 @@ public class MainApp {
                         }
 
                         if (m == 2) {
-
-                            TrouveObjetCat(con);
+                          System.out.println("Entrez la catégorie d'objet que vous recherchez");
+                          String nom = Lire.S();
+                            TrouveObjetCat(con, nom);
                         }
                         
                          if (m == 3) {
-
-                            TrouveObjetMot(con);
+                            System.out.println("Entrez un mot clé pour chercher des objets correspondants");
+                            String mot = Lire.S();
+                            TrouveObjetMot(con, mot);
                         }
                          
                          if (m == 4) {
@@ -231,7 +225,7 @@ public class MainApp {
 
                         if (m == 2) {
 
-                            TrouveUtilisateurNom(con);//trouvecategorie
+                            //TrouveUtilisateurNom(con);//trouvecategorie
                         }
 
                         if (m == 0) {
