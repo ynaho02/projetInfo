@@ -1,5 +1,5 @@
 
-        /*
+/*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Project/Maven2/JavaApp/src/main/java/${packagePath}/${mainClassName}.java to edit this template
  */
@@ -15,7 +15,6 @@ import static com.mycompany.projetinfo.GestionBD.creeSchema;
 import static com.mycompany.projetinfo.GestionBD.defautConnect;
 import static com.mycompany.projetinfo.GestionBD.deleteSchema;
 import static com.mycompany.projetinfo.GestionBD.demandeUpdateFin;
-
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -53,12 +52,12 @@ public class MainApp {
             System.out.println("Entrez (e) si votre requete concerne la table enchere");
             System.out.println("Entrez (o) si vous avez rien à foutre ici");
             u = Lire.c();
-            System.out.println("vous avez demandé \""+u+"\"");
+            System.out.println("vous avez demandé \"" + u + "\"");
 
             try {
 
                 if (u == 'a') {
-                    m=-1;
+                    m = -1;
                     while (m != 0) {
                         System.out.println("Bienvenue dans le menu ensemble de tables!");
                         System.out.println("Voici vos options");
@@ -80,7 +79,7 @@ public class MainApp {
                         }
                         if (m == 0) {
                             System.out.println("eh bien aurevoir");
-                       
+
                         }
 
                     }
@@ -88,7 +87,7 @@ public class MainApp {
                 }
 
                 if (u == 'b') {
-                    m=-1;
+                    m = -1;
 
                     while (m != 0) {
                         System.out.println("Bienvenue dans le menu utilisateur !");
@@ -103,24 +102,30 @@ public class MainApp {
                         m = Lire.i();
 
                         if (m == 1) {
-
-                            GestionBD.demandeUtilisateur(con);
+                            System.out.println("--- creation nouvel utilisateur");
+                            System.out.println("Entrez votre nom, votre prénom et votre mail");
+                            String nom = Lire.S();
+                            String prenom = Lire.S();
+                            String email = Lire.S();
+                            GestionBD.demandeUtilisateur(con, nom, prenom, email);
+                            System.out.println("Utilisateur ajouté avec succès.");
                         }
 
                         if (m == 2) {
-                          System.out.println("entrez le nom de l'utilisateur recherché");
-                          String nomuser = Lire.S();
-                          TrouveUtilisateurNom(con, nomuser);
+                            System.out.println("entrez le nom de l'utilisateur recherché");
+                            String nomuser = Lire.S();
+                            TrouveUtilisateurNom(con, nomuser);
                         }
 
                         if (m == 3) {
 
                             afficheUsers(con);
                         }
-                        
-                        if (m == 4) {
 
-                            BilanUser(con);
+                        if (m == 4) {
+                            System.out.println("entrez le nom de l'utilisateur pour qui vous voulez le bilan");
+                            String nomuser = Lire.S();
+                            BilanUser(con, nomuser);
                         }
 
                         if (m == 0) {
@@ -132,7 +137,7 @@ public class MainApp {
                 }
 
                 if (u == 'c') {
-                    m=-1;
+                    m = -1;
 
                     while (m != 0) {
                         System.out.println("Bienvenue dans le menu objet!");
@@ -146,25 +151,81 @@ public class MainApp {
                         m = Lire.i();
 
                         if (m == 1) {
+                            System.out.println("--- ajout nouvel objet");
 
-                            GestionBD.demandeObjet(con);
+                            System.out.println("Entrez le titre de l'objet");//, une petite description, le prix de base et la date souhaitée de fin d'enchere");
+                            String titre = Lire.S();
+
+                            System.out.println("Entrez une description de l'objet");
+                            String description = Lire.S();
+
+                            System.out.println("Entrez le prix de base de l'objet (en euros)");
+                            int prixbase = Lire.i();
+
+                            System.out.println("Maintenant vous allez entrer la date de fin d'enchere");
+
+                            System.out.println("Entrez l'annee");
+                            int annee = Lire.i();
+
+                            System.out.println("Entrez le mois");
+                            int mois = Lire.i();
+
+                            System.out.println("entrez la date");
+                            int date = Lire.i();
+
+                            int heure = 00;
+                            int minute = 00;
+                            int seconde = 00;
+
+                            String Fin = annee + "-" + mois + "-" + date + " " + heure + ":" + minute + ":" + seconde; //je crée un string de format exact à ce à quoi est sensé ressembler un timestamp
+
+                            System.out.println("A present vous allez attribuer une catégorie à votre objet, entrez le nom de cette categorie ");
+                            String nomcat = Lire.S();
+
+                            System.out.println("A present il faut vous associer à cet objet, entrez donc votre nom ");
+                            String nomuser = Lire.S();
+                            GestionBD.demandeObjet(con, titre, description, prixbase, annee, mois, date, Fin, nomcat, nomuser);
+
+                            System.out.println("Objet ajouté avec succès.");
+
                         }
 
                         if (m == 2) {
-                          System.out.println("Entrez la catégorie d'objet que vous recherchez");
-                          String nom = Lire.S();
+                            System.out.println("Entrez la catégorie d'objet que vous recherchez");
+                            String nom = Lire.S();
                             TrouveObjetCat(con, nom);
                         }
-                        
-                         if (m == 3) {
+
+                        if (m == 3) {
                             System.out.println("Entrez un mot clé pour chercher des objets correspondants");
                             String mot = Lire.S();
                             TrouveObjetMot(con, mot);
                         }
-                         
-                         if (m == 4) {
 
-                            demandeUpdateFin(con);
+                        if (m == 4) {
+
+                            System.out.println("--- modification date de fin de mise en enchere");
+
+                            System.out.println("entrez le nom de l'objet concerné");
+
+                            String Titre = Lire.S();
+
+                            System.out.println("Entrez l'annee");
+                            int annee = Lire.i();
+
+                            System.out.println("Entrez le mois");
+                            int mois = Lire.i();
+
+                            System.out.println("entrez la date");
+                            int jour = Lire.i();
+
+                            int heure = 00;
+                            int minute = 00;
+                            int seconde = 00;
+
+                            String Fin = annee + "-" + mois + "-" + jour + " " + heure + ":" + minute + ":" + seconde; //je crée un string de format exact à ce à quoi est sensé ressembler un timestamp
+                            demandeUpdateFin(con, Titre, annee, mois, jour, Fin);
+                            System.out.println("La date a été modifiée avec succès.");
                         }
 
                         if (m == 0) {
@@ -176,7 +237,7 @@ public class MainApp {
                 }
 
                 if (u == 'd') {
-                    m=-1;
+                    m = -1;
 
                     while (m != 0) {
                         System.out.println("Bienvenue dans le menu categorie!");
@@ -188,13 +249,18 @@ public class MainApp {
                         m = Lire.i();
 
                         if (m == 1) {
-
-                            GestionBD.demandeCategorie(con);
+                            System.out.println("--- creation nouvelle categorie");
+                            System.out.println("Entrez le nom de la categorie");
+                            String nomcat = Lire.S();
+                            GestionBD.demandeCategorie(con, nomcat);
+                            System.out.println("Catégorie ajoutée avec succès");
                         }
 
                         if (m == 2) {
+                            System.out.println("entrez le nom de la categorie recherchée");
+                            String nomcat = Lire.S();
+                            TrouveidCategorie(con, nomcat);
 
-                            TrouveidCategorie(con);
                         }
 
                         if (m == 0) {
@@ -206,7 +272,7 @@ public class MainApp {
                 }
 
                 if (u == 'e') {
-                    m=-1;
+                    m = -1;
 
                     while (m != 0) {
                         System.out.println("Bienvenue dans le menu enchere!");
@@ -219,8 +285,17 @@ public class MainApp {
                         m = Lire.i();
 
                         if (m == 1) {
+                            System.out.println("--- ajout nouvelle enchere");
 
-                            GestionBD.demandeEnchere(con); //demandeEnchere
+                            System.out.println("Entrez le titre de l'objet sur lequel vous souhaitez faire une enchere: ");
+                            String titreobj = Lire.S();
+
+                            System.out.println("Entrez le montant de votre offre:");
+                            int offre = Lire.i();
+
+                            System.out.println("A present vous allez vous identifier à votre enchere, entrez votre nom:");
+                            String nomuser = Lire.S();
+                            GestionBD.demandeEnchere(con, titreobj, offre, nomuser); //demandeEnchere
                         }
 
                         if (m == 2) {

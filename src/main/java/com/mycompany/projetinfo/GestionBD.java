@@ -285,19 +285,15 @@ public class GestionBD {
     public static class CategorieExisteDejaException extends Exception {
     }
 
-    public static void demandeUtilisateur(Connection con) throws SQLException {
+    public static void demandeUtilisateur(Connection con, String nom, String prenom, String email) throws SQLException {
         boolean existe = true;
         while (existe) {
-            System.out.println("--- creation nouvel utilisateur");
-            System.out.println("Entrez votre nom, votre prénom et votre mail");
-            String nom = Lire.S();
-            String prenom = Lire.S();
-            String email = Lire.S();
+
             try {
                 createUtilisateur(con, nom, prenom, email);
                 existe = false;
             } catch (EmailExisteDejaException ex) {
-                System.out.println("cet email est déjà prit, choisissez en un autre");
+                System.out.println("Cet email est déjà prit, choisissez en un autre.");
             }
         }
     }
@@ -482,23 +478,15 @@ public class GestionBD {
     public static class DelaiDEnchereDepasseException extends Exception {
     }
 
-    public static void demandeEnchere(Connection con) throws SQLException, UtilisateurNexistePasException, ObjetNexistePasException, MontantTropPetitException, DelaiDEnchereDepasseException {
+    public static void demandeEnchere(Connection con, String titreobj, int offre, String nomuser) throws SQLException, UtilisateurNexistePasException, ObjetNexistePasException, MontantTropPetitException, DelaiDEnchereDepasseException {
         boolean existe = true;
         while (existe) {
-
-            System.out.println("--- ajout nouvelle enchere");
 
             int sur = -1;
             int de = -1;
             int max = -1;
 
             Timestamp quand = new Timestamp(System.currentTimeMillis());
-
-            System.out.println("Entrez le titre de l'objet sur lequel vous souhaitez faire une enchere: ");
-            String titreobj = Lire.S();
-
-            System.out.println("Entrez le montant de votre offre:");
-            int offre = Lire.i();
 
             try ( PreparedStatement chercheObj = con.prepareStatement( //on vérifie que l'objet sur lequel on veut faire l'enchere est bien dans la bdd
                     "select id from objet2 where titre = ?")) {
@@ -519,8 +507,7 @@ public class GestionBD {
 
             try ( PreparedStatement chercheUser = con.prepareStatement( //on vérifie que l'utilisateur est bien dans la bdd
                     "select id from utilisateur2 where nom = ?")) {
-                System.out.println("A present vous allez vous identifier à votre enchere, entrez votre nom:");
-                String nomuser = Lire.S();
+
                 chercheUser.setString(1, nomuser);
                 ResultSet testUser = chercheUser.executeQuery();
 
@@ -536,7 +523,6 @@ public class GestionBD {
                 System.out.println(" L'utilisateur susmentionné n'existe pas.");
             }
 
-            
             try ( PreparedStatement chercheQuand = con.prepareStatement( //on s'assure que le délai de l'enchere n'est pas dépassé
                     """
                 select fin from objet2 
@@ -592,13 +578,13 @@ public class GestionBD {
                             }
 
                         } else {
-                            PreparedStatement cherchePrixBase = con.prepareStatement( 
+                            PreparedStatement cherchePrixBase = con.prepareStatement(
                                     """
                 select prixbase from objet2 where titre = ? 
                
                 """
                             );
-                            
+
                             cherchePrixBase.setString(1, titreobj);
                             ResultSet testPrixBase = cherchePrixBase.executeQuery();
                             testPrixBase.next();
@@ -630,38 +616,10 @@ public class GestionBD {
 
     }
 
-    public static void demandeObjet(Connection con) throws SQLException, UtilisateurNexistePasException, CategorieNexistePasException {
+    public static void demandeObjet(Connection con, String titre, String description, int prixbase, int annee, int mois, int date, String Fin, String nomcat, String nomuser) throws SQLException, UtilisateurNexistePasException, CategorieNexistePasException {
 
         boolean existe = true;
         while (existe) {
-
-            System.out.println("--- ajout nouvel objet");
-
-            System.out.println("Entrez le titre de l'objet");//, une petite description, le prix de base et la date souhaitée de fin d'enchere");
-            String titre = Lire.S();
-
-            System.out.println("Entrez une description de l'objet");
-            String description = Lire.S();
-
-            System.out.println("Entrez le prix de base de l'objet (en euros)");
-            int prixbase = Lire.i();
-
-            System.out.println("Maintenant vous allez entrer la date de fin d'enchere");
-
-            System.out.println("Entrez l'annee");
-            int annee = Lire.i();
-
-            System.out.println("Entrez le mois");
-            int mois = Lire.i();
-
-            System.out.println("entrez la date");
-            int date = Lire.i();
-
-            int heure = 00;
-            int minute = 00;
-            int seconde = 00;
-
-            String Fin = annee + "-" + mois + "-" + date + " " + heure + ":" + minute + ":" + seconde; //je crée un string de format exact à ce à quoi est sensé ressembler un timestamp
 
             Timestamp debut = new Timestamp(System.currentTimeMillis());
             Timestamp fin = Timestamp.valueOf(Fin); //valueof convertit un string en si on veut valeur d'une horloge
@@ -669,11 +627,10 @@ public class GestionBD {
             int categorie = -1;
             int proposepar = -1;
 
-            try ( PreparedStatement chercheCat = con.prepareStatement(
+            try ( PreparedStatement chercheCat = con.prepareStatement( //ici on récupère l'id de la cat correspondante
                     "select id from categorie2 where nom = ?")) {
-                System.out.println("A present vous allez attribuer une catégorie à votre objet, entrez le nom de cette categorie ");
-                String nom = Lire.S();
-                chercheCat.setString(1, nom);
+
+                chercheCat.setString(1, nomcat);
                 ResultSet testCat = chercheCat.executeQuery();
 
                 if (testCat.next()) {
@@ -689,9 +646,8 @@ public class GestionBD {
 
             try ( PreparedStatement chercheUs = con.prepareStatement(
                     "select id from utilisateur2 where nom = ?")) {
-                System.out.println("A present il faut vous associer à cet objet, entrez donc votre nom ");
-                String Nom = Lire.S();
-                chercheUs.setString(1, Nom);
+
+                chercheUs.setString(1, nomuser);
                 ResultSet testUs = chercheUs.executeQuery();
                 if (testUs.next()) {
 
@@ -716,14 +672,12 @@ public class GestionBD {
 
     }
 
-    public static void demandeCategorie(Connection con) throws SQLException, CategorieExisteDejaException { //entrer manuellement de nouvelles categories
+    public static void demandeCategorie(Connection con, String nomcat) throws SQLException, CategorieExisteDejaException { //entrer manuellement de nouvelles categories
         boolean existe = true;
         while (existe) {
-            System.out.println("--- creation nouvel categorie");
-            System.out.println("Entrez le nom de la categorie");
-            String nom = Lire.S();
+
             try {
-                createCategorie(con, nom);
+                createCategorie(con, nomcat);
                 existe = false;
             } catch (CategorieExisteDejaException ex) {
                 System.out.println("Categorie deja existante, cherchez bien!");
@@ -791,7 +745,7 @@ public class GestionBD {
         }
     }
 
-    public static void BilanUser(Connection con) throws SQLException { //il manque une vérification de si l'utilisateur existe vraiment ou pas
+    public static void BilanUser(Connection con, String nomuser) throws SQLException { //il manque une vérification de si l'utilisateur existe vraiment ou pas
 
         con.setAutoCommit(false);
         try ( PreparedStatement searchuser = con.prepareStatement(
@@ -802,9 +756,8 @@ public class GestionBD {
                                                                   
                 """
         )) {
-            System.out.println("entrez le nom de l'utilisateur pour qui vous voulez le bilan");
-            String nom = Lire.S();
-            searchuser.setString(1, nom); //on indique ici que le premier point ? référence le nom
+            
+            searchuser.setString(1, nomuser); //on indique ici que le premier point ? référence le nom
             ResultSet testNom = searchuser.executeQuery();
 
             boolean exist = false;
@@ -840,7 +793,7 @@ public class GestionBD {
             cherchetitre.setString(1, titre); //on indique ici que le premier point ? référence le mail
             ResultSet testTitre = cherchetitre.executeQuery();
             if (testTitre.next()) {
-                System.out.println("ok objet retrouvé");
+                System.out.println("Nous avons retrouvé l'objet concerné.");
             } else {
                 throw new ObjetNexistePasException();
 
@@ -868,30 +821,10 @@ public class GestionBD {
 
     }
 
-    public static void demandeUpdateFin(Connection con) throws SQLException, ObjetNexistePasException {
+    public static void demandeUpdateFin(Connection con, String Titre, int annee, int mois, int jour, String Fin) throws SQLException, ObjetNexistePasException {
 
         boolean existe = true;
         while (existe) {
-            System.out.println("--- modification date de fin de mise en enchere");
-
-            System.out.println("entrez le nom de l'objet concerné");
-
-            String Titre = Lire.S();
-
-            System.out.println("Entrez l'annee");
-            int annee = Lire.i();
-
-            System.out.println("Entrez le mois");
-            int mois = Lire.i();
-
-            System.out.println("entrez la date");
-            int date = Lire.i();
-
-            int heure = 00;
-            int minute = 00;
-            int seconde = 00;
-
-            String Fin = annee + "-" + mois + "-" + date + " " + heure + ":" + minute + ":" + seconde; //je crée un string de format exact à ce à quoi est sensé ressembler un timestamp
 
             Timestamp fin = Timestamp.valueOf(Fin); //valueof convertit un string en si on veut valeur d'une horloge;
             try {
@@ -904,13 +837,12 @@ public class GestionBD {
 
     }
 
-    public static void TrouveidCategorie(Connection con) throws SQLException, CategorieNexistePasException {
+    public static void TrouveidCategorie(Connection con, String nomcat) throws SQLException, CategorieNexistePasException {
 
         con.setAutoCommit(false);
         try ( PreparedStatement searchcat = con.prepareStatement("select idfrom categorie2 where nom = ?")) {
-            System.out.println("entrez le nom de la categorie recherchée");
-            String nom = Lire.S();
-            searchcat.setString(1, nom); //on indique ici que le premier point ? référence le nom
+
+            searchcat.setString(1, nomcat); //on indique ici que le premier point ? référence le nom
             ResultSet testCat = searchcat.executeQuery();
 
             boolean exist = false;
@@ -931,14 +863,13 @@ public class GestionBD {
 
     }
 
-    public static void main(String[] args) {
-        try ( Connection con = defautConnect()) {
-            System.out.println("connection réussie");
-//            demandeEnchere(con);
-            TrouveObjetMot(con);
-        } catch (Exception ex) {
-            throw new Error(ex);
-        }
-    }
-
+//    public static void main(String[] args) {
+//        try ( Connection con = defautConnect()) {
+//            System.out.println("connection réussie");
+////            demandeEnchere(con);
+//            TrouveObjetMot(con);
+//        } catch (Exception ex) {
+//            throw new Error(ex);
+//        }
+//    }
 }
