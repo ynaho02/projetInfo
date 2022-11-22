@@ -302,13 +302,12 @@ public class GestionBD {
         }
     }
 
-    public static void TrouveUtilisateurNom(Connection con) throws SQLException { //choisir un utilisateur à partir de son nom et renvoyer ses infos
+    public static void TrouveUtilisateurNom(Connection con, String nomuser) throws SQLException { //choisir un utilisateur à partir de son nom et renvoyer ses infos
 
         con.setAutoCommit(false);
         try ( PreparedStatement searchuser = con.prepareStatement("select id, prenom, email from utilisateur2 where nom = ?")) {
-            System.out.println("entrez le nom de l'utilisateur recherché");
-            String nom = Lire.S();
-            searchuser.setString(1, nom); //on indique ici que le premier point ? référence le nom
+
+            searchuser.setString(1, nomuser); //on indique ici que le premier point ? référence le nom
             ResultSet testNom = searchuser.executeQuery();
 
             boolean exist = false;
@@ -495,10 +494,10 @@ public class GestionBD {
 
             Timestamp quand = new Timestamp(System.currentTimeMillis());
 
-            System.out.println("Entrez le titre de l'objet sur lequel vous souhaitez faire une enchere ");
+            System.out.println("Entrez le titre de l'objet sur lequel vous souhaitez faire une enchere: ");
             String titreobj = Lire.S();
 
-            System.out.println("entrez le montant de votre choix");
+            System.out.println("Entrez le montant de votre offre:");
             int offre = Lire.i();
 
             try ( PreparedStatement chercheObj = con.prepareStatement( //on vérifie que l'objet sur lequel on veut faire l'enchere est bien dans la bdd
@@ -515,12 +514,12 @@ public class GestionBD {
 
                 }
             } catch (ObjetNexistePasException ex) {
-                System.out.println(" l'objet voulu n'existe pas, retournez dans le menu le créer");
+                System.out.println(" L'objet voulu n'est pas répertorié.");
             }
 
             try ( PreparedStatement chercheUser = con.prepareStatement( //on vérifie que l'utilisateur est bien dans la bdd
                     "select id from utilisateur2 where nom = ?")) {
-                System.out.println("A present vous allez vous identifier à votre enchere, entrez votre nom");
+                System.out.println("A present vous allez vous identifier à votre enchere, entrez votre nom:");
                 String nomuser = Lire.S();
                 chercheUser.setString(1, nomuser);
                 ResultSet testUser = chercheUser.executeQuery();
@@ -534,9 +533,40 @@ public class GestionBD {
                 }
 
             } catch (UtilisateurNexistePasException ex) {
-                System.out.println(" l'utilisateur voulu n'existe pas, retournez dans le menu le créer");
+                System.out.println(" L'utilisateur susmentionné n'existe pas.");
             }
-//
+
+            
+            try ( PreparedStatement chercheQuand = con.prepareStatement( //on s'assure que le délai de l'enchere n'est pas dépassé
+                    """
+                select fin from objet2 
+                where titre=?
+               
+                """
+            )) {
+
+                Timestamp fin = new Timestamp(0, 0, 0, 0, 0, 0, 0);
+
+                chercheQuand.setString(1, titreobj);
+                ResultSet testQuand = chercheQuand.executeQuery();
+
+                if (testQuand.next()) {
+
+                    fin = testQuand.getTimestamp("fin");
+
+                    if (quand.after(fin)) {
+
+                        throw new DelaiDEnchereDepasseException();
+                    } else {
+
+                        System.out.println("Le délai d'enchère est respecté.");
+                    }
+
+                }
+            } catch (DelaiDEnchereDepasseException ex) {
+                System.out.println("Les enchères pour cet objet sont malheureusement closes.");
+            }
+
             try (
                      PreparedStatement chercheMontant = con.prepareStatement( //on s'occupe de la contrainte de l'enchere faite doit etre supérieure au max ou au prix base
                             """
@@ -558,18 +588,19 @@ public class GestionBD {
                                 throw new MontantTropPetitException();
                             } else {
 
-                                System.out.println("offre acceptée");
+                                System.out.println("Votre offre est acceptée.");
                             }
 
                         } else {
-                            PreparedStatement charchePrixBase = con.prepareStatement( //on s'occupe de la contrainte de l'enchere faite doit etre supérieure au max ou au prix base
+                            PreparedStatement cherchePrixBase = con.prepareStatement( 
                                     """
                 select prixbase from objet2 where titre = ? 
                
                 """
                             );
-                            charchePrixBase.setString(1, titreobj);
-                            ResultSet testPrixBase = charchePrixBase.executeQuery();
+                            
+                            cherchePrixBase.setString(1, titreobj);
+                            ResultSet testPrixBase = cherchePrixBase.executeQuery();
                             testPrixBase.next();
 
                             max = testPrixBase.getInt("prixbase");
@@ -579,42 +610,12 @@ public class GestionBD {
                                 throw new MontantTropPetitException();
                             } else {
 
-                                System.out.println("offre acceptée");
+                                System.out.println("Votre offre est acceptée.");
                             }
 
                         }
                     } catch (MontantTropPetitException ex) {
-                        System.out.println(" votre offre est trop petite désolé");
-                    }
-
-                    try ( PreparedStatement chercheQuand = con.prepareStatement( //on s'assure que le délai de l'enchere n'est pas dépassé
-                            """
-                select fin from objet2 
-                where titre=?
-               
-                """
-                    )) {
-
-                        Timestamp fin = new Timestamp(0, 0, 0, 0, 0, 0, 0);
-
-                        chercheQuand.setString(1, titreobj);
-                        ResultSet testQuand = chercheQuand.executeQuery();
-
-                        if (testQuand.next()) {
-
-                            fin = testQuand.getTimestamp("fin");
-
-                            if (quand.after(fin)) {
-
-                                throw new DelaiDEnchereDepasseException();
-                            } else {
-
-                                System.out.println("enchere acceptée");
-                            }
-
-                        }
-                    } catch (DelaiDEnchereDepasseException ex) {
-                        System.out.println(" les enchères pour cet objet sont closes désolé");
+                        System.out.println("Cependant, votre offre est trop petite désolé.");
                     }
 
                     try {
@@ -730,7 +731,7 @@ public class GestionBD {
         }
     }
 
-    public static void TrouveObjetCat(Connection con) throws SQLException {
+    public static void TrouveObjetCat(Connection con, String nom) throws SQLException {
         con.setAutoCommit(false);
         try ( PreparedStatement searchobjet = con.prepareStatement(
                 """
@@ -742,8 +743,6 @@ public class GestionBD {
         """
         )) {
 
-            System.out.println("Entrez la catégorie d'objet que vous recherchez");
-            String nom = Lire.S();
             searchobjet.setString(1, nom); //on indique ici que le premier point ? référence le nom
             ResultSet rs = searchobjet.executeQuery();
 
@@ -763,7 +762,7 @@ public class GestionBD {
         }
     }
 
-    public static void TrouveObjetMot(Connection con) throws SQLException {
+    public static void TrouveObjetMot(Connection con, String mot) throws SQLException {
         con.setAutoCommit(false);
         try ( PreparedStatement searchobjett = con.prepareStatement(
                 """
@@ -773,9 +772,7 @@ public class GestionBD {
         """
         )) {
 
-            System.out.println("Entrez un mot clé pour chercher des objets correspondants");
-            String mot = Lire.S();
-            searchobjett.setString(1, "%"+mot+"%");
+            searchobjett.setString(1, "%" + mot + "%");
             ResultSet rs = searchobjett.executeQuery();
 
             while (rs.next()) {
@@ -938,7 +935,7 @@ public class GestionBD {
         try ( Connection con = defautConnect()) {
             System.out.println("connection réussie");
 //            demandeEnchere(con);
-TrouveObjetMot(con);
+            TrouveObjetMot(con);
         } catch (Exception ex) {
             throw new Error(ex);
         }
