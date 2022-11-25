@@ -4,6 +4,7 @@
  */
 package com.mycompany.projetinfo;
 
+import com.mycompany.projetinfo.GestionBD.MontantTropPetitException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -43,30 +44,51 @@ public class GestionBD {
         con.setAutoCommit(false);
         try ( Statement st = con.createStatement()) {
 
-            // creation des tables
-            String utilisateur2 = "create table utilisateur2"
+//            // creation des tables
+            String utilisateur = "create table utilisateur"
                     + ""
                     + "("
                     + "id integer not null primary key generated always as identity,"
                     + " nom varchar (30),"
                     + "prenom varchar(40),"
-                    + "email varchar(100) unique"
+                    + "email varchar(100) unique,"
+                    + "mdp varchar (30),"
+                    + "codepostal varchar (100)"
                     + ")";
 
-            st.executeUpdate(utilisateur2);
-            System.out.println("table utilisateur2 created");
+            st.executeUpdate(utilisateur);
+            System.out.println("table utilisateur created");
 
-            String categorie2 = "create table categorie2"
+            String categoriegenerale = "create table categoriegenerale"
                     + ""
                     + "("
                     + "id integer not null primary key generated always as identity ,"
                     + "nom varchar (30)"
                     + ")";
 
-            st.executeUpdate(categorie2);
-            System.out.println("table categorie2 created");
+            st.executeUpdate(categoriegenerale);
+            System.out.println("table categoriegenerale created");
 
-            String objet2 = "create table objet2"
+            String categorie = "create table categorie"
+                    + ""
+                    + "("
+                    + "id integer not null primary key generated always as identity ,"
+                    + "nom varchar (30),"
+                    + "generale integer"
+                    + ")";
+
+            st.executeUpdate(categorie);
+            System.out.println("table categorie created");
+
+            st.executeUpdate(
+                    """
+                    alter table categorie
+                        add constraint fk_categorie_generale
+                        foreign key (generale) references categoriegenerale(id)
+                    """);
+            System.out.println("clé externe generale ajoutée");
+
+            String objet = "create table objet"
                     + ""
                     + "("
                     + "id integer not null primary key generated always as identity ,"
@@ -76,30 +98,39 @@ public class GestionBD {
                     + "fin timestamp,"
                     + "prixbase integer,"
                     + "proposepar integer,"
+                    + "categoriegenerale integer,"
                     + "categorie integer"
                     + ")";
 
-            st.executeUpdate(objet2);
+            st.executeUpdate(objet);
 
-            System.out.println("table objet2 created");
+            System.out.println("table objet created");
 
             st.executeUpdate(
                     """
-                    alter table objet2
-                        add constraint fk_objet2_proposepar
-                        foreign key (proposepar) references utilisateur2(id)
+                    alter table objet
+                        add constraint fk_objet_proposepar
+                        foreign key (proposepar) references utilisateur(id)
                     """);
-            System.out.println("clé externe propose par ajoutée");
+            System.out.println("clé externe proposepar ajoutée");
 
             st.executeUpdate(
                     """
-                    alter table objet2
-                        add constraint fk_objet2_categorie
-                        foreign key (categorie) references categorie2(id)
+                    alter table objet
+                        add constraint fk_objet_categorie
+                        foreign key (categorie) references categorie(id)
                     """);
             System.out.println("clé externe categorie ajoutée");
 
-            String enchere2 = "create table enchere2"
+            st.executeUpdate(
+                    """
+                    alter table objet
+                        add constraint fk_objet_categoriegenerale
+                        foreign key (categoriegenerale) references categoriegenerale(id)
+                    """);
+            System.out.println("clé externe categoriegenerale ajoutée");
+
+            String enchere = "create table enchere"
                     + ""
                     + "("
                     + "id integer not null primary key generated always as identity ,"
@@ -109,22 +140,22 @@ public class GestionBD {
                     + "de integer"
                     + ")";
 
-            st.executeUpdate(enchere2);
-            System.out.println("table enchere2 created");
+            st.executeUpdate(enchere);
+            System.out.println("table enchere created");
 
             st.executeUpdate(
                     """
-                    alter table enchere2
-                        add constraint fk_enchere2_de
-                        foreign key (de) references utilisateur2(id)
+                    alter table enchere
+                        add constraint fk_enchere_de
+                        foreign key (de) references utilisateur(id)
                     """);
             System.out.println("clé externe de ajoutée");
 
             st.executeUpdate(
                     """
-                    alter table enchere2
-                        add constraint fk_enchere2_sur
-                        foreign key (sur) references objet2(id)
+                    alter table enchere
+                        add constraint fk_enchere_sur
+                        foreign key (sur) references objet(id)
                     """);
             System.out.println("clé externe sur ajoutée");
 
@@ -149,14 +180,15 @@ public class GestionBD {
 
     public static void deleteSchema(Connection con) throws SQLException {
         try ( Statement st = con.createStatement()) {
+
             // pour être sûr de pouvoir supprimer, il faut d'abord supprimer les liens
             // puis les tables
             // suppression des liens
             try {
                 st.executeUpdate(
                         """
-                    alter table objet2
-                        drop constraint fk_objet2_proposepar
+                    alter table objet
+                        drop constraint fk_objet_proposepar
                              """);
                 System.out.println("constraint fk_proposepar dropped");
             } catch (SQLException ex) {
@@ -165,10 +197,30 @@ public class GestionBD {
             try {
                 st.executeUpdate(
                         """
-                    alter table objet2
-                        drop constraint fk_objet2_categorie
+                    alter table objet
+                        drop constraint fk_objet_categorie
                     """);
                 System.out.println("constraint fk_categorie dropped");
+            } catch (SQLException ex) {
+                // nothing to do : maybe the constraint was not created
+            }
+            try {
+                st.executeUpdate(
+                        """
+                    alter table objet
+                        drop constraint fk_objet_categoriegenerale
+                    """);
+                System.out.println("constraint fk_categoriegenerale dropped");
+            } catch (SQLException ex) {
+                // nothing to do : maybe the constraint was not created
+            }
+            try {
+                st.executeUpdate(
+                        """
+                    alter table categorie
+                        drop constraint fk_categorie_generale
+                    """);
+                System.out.println("constraint fk_generale dropped");
             } catch (SQLException ex) {
                 // nothing to do : maybe the constraint was not created
             }
@@ -176,49 +228,33 @@ public class GestionBD {
             try {
                 st.executeUpdate(
                         """
-                    alter table enchere2
-                        drop constraint fk_enchere2_de
+                    alter table enchere
+                        drop constraint fk_enchere_de
                     """);
                 System.out.println("constraint fk_de dropped");
             } catch (SQLException ex) {
                 // nothing to do : maybe the constraint was not created
             }
+
             try {
                 st.executeUpdate(
                         """
-                    alter table enchere2
-                        drop constraint fk_enchere2_sur
+                    alter table enchere
+                        drop constraint fk_enchere_sur
                     """);
                 System.out.println("constraint fk_sur dropped");
             } catch (SQLException ex) {
                 // nothing to do : maybe the constraint was not created
             }
 
+//
             // je peux maintenant supprimer les tables
             try {
                 st.executeUpdate(
                         """
-                    drop table utilisateur2
+                    drop table utilisateur
                     """);
-                System.out.println("dable utilisateur2 dropped");
-            } catch (SQLException ex) {
-                // nothing to do : maybe the table was not created
-            }
-            try {
-                st.executeUpdate(
-                        """
-                    drop table objet2
-                    """);
-                System.out.println("table objet2 dropped");
-            } catch (SQLException ex) {
-                // nothing to do : maybe the table was not created
-            }
-            try {
-                st.executeUpdate(
-                        """
-                    drop table enchere2
-                    """);
-                System.out.println("table enchere2 dropped");
+                System.out.println("table utilisateur dropped");
             } catch (SQLException ex) {
                 // nothing to do : maybe the table was not created
             }
@@ -226,22 +262,55 @@ public class GestionBD {
             try {
                 st.executeUpdate(
                         """
-                    drop table categorie2
+                    drop table objet
                     """);
-                System.out.println("table categorie2 dropped");
+                System.out.println("table objet dropped");
             } catch (SQLException ex) {
                 // nothing to do : maybe the table was not created
             }
+            try {
+                st.executeUpdate(
+                        """
+                    drop table enchere
+                    """);
+                System.out.println("table enchere dropped");
+            } catch (SQLException ex) {
+                // nothing to do : maybe the table was not created
+            }
+
+//
+            try {
+                st.executeUpdate(
+                        """
+                    drop table categorie
+                    """);
+                System.out.println("table categorie dropped");
+            } catch (SQLException ex) {
+                // nothing to do : maybe the table was not created
+            }
+
+            try {
+                st.executeUpdate(
+                        """
+                    drop table categoriegenerale
+                    """);
+                System.out.println("table categoriegenerale dropped");
+            } catch (SQLException ex) {
+                // nothing to do : maybe the table was not created
+            }
+
+        } catch (SQLException ex) {
+            // nothing to do : maybe the table was not created
         }
     }
 
-    public static int createUtilisateur(Connection con, String nom, String prenom, String email)
+    public static int createUtilisateur(Connection con, String nom, String prenom, String email, String mdp, String codepostal)
             throws SQLException, EmailExisteDejaException {
         // je me place dans une transaction pour m'assurer que la séquence
         // test du nom - création est bien atomique et isolée
         con.setAutoCommit(false);
         try ( PreparedStatement chercheEmail = con.prepareStatement(
-                "select id from utilisateur2 where email = ?")) { //seul le mail doit etre unique pour notre bdd
+                "select id from utilisateur where email = ?")) { //seul le mail doit etre unique pour notre bdd
             chercheEmail.setString(1, email); //on indique ici que le premier point ? référence le mail
             ResultSet testEmail = chercheEmail.executeQuery();
             if (testEmail.next()) {
@@ -251,11 +320,13 @@ public class GestionBD {
             // que je veux qu'il conserve les clés générées
             try ( PreparedStatement pst = con.prepareStatement(
                     """
-                insert into utilisateur2 (nom,prenom,email) values (?,?,?)
+                insert into utilisateur (nom,prenom,email,mdp,codepostal) values (?,?,?,?,?)
                 """, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 pst.setString(1, nom);
                 pst.setString(2, prenom);
                 pst.setString(3, email);
+                pst.setString(4, mdp);
+                pst.setString(5, codepostal);
                 pst.executeUpdate();
                 con.commit();
 
@@ -285,12 +356,12 @@ public class GestionBD {
     public static class CategorieExisteDejaException extends Exception {
     }
 
-    public static void demandeUtilisateur(Connection con, String nom, String prenom, String email) throws SQLException {
+    public static void demandeUtilisateur(Connection con, String nom, String prenom, String email, String mdp, String codepostal) throws SQLException {
         boolean existe = true;
         while (existe) {
 
             try {
-                createUtilisateur(con, nom, prenom, email);
+                createUtilisateur(con, nom, prenom, email, mdp, codepostal);
                 existe = false;
             } catch (EmailExisteDejaException ex) {
                 System.out.println("Cet email est déjà prit, choisissez en un autre.");
@@ -298,12 +369,12 @@ public class GestionBD {
         }
     }
 
-    public static void TrouveUtilisateurNom(Connection con, String nomuser) throws SQLException { //choisir un utilisateur à partir de son nom et renvoyer ses infos
+    public static void TrouveUtilisateurNom(Connection con, String mail) throws SQLException { //choisir un utilisateur à partir de son nom et renvoyer ses infos
 
         con.setAutoCommit(false);
-        try ( PreparedStatement searchuser = con.prepareStatement("select id, prenom, email from utilisateur2 where nom = ?")) {
+        try ( PreparedStatement searchuser = con.prepareStatement("select * from utilisateur where email = ?")) {
 
-            searchuser.setString(1, nomuser); //on indique ici que le premier point ? référence le nom
+            searchuser.setString(1, mail); //on indique ici que le premier point ? référence le nom
             ResultSet testNom = searchuser.executeQuery();
 
             boolean exist = false;
@@ -315,9 +386,11 @@ public class GestionBD {
                 if (exist == true) {
 
                     System.out.println("voici les infos de l'utilisateur cherché");
-                    System.out.println("id: " + testNom.getInt("id"));
-                    System.out.println("Prenom: " + testNom.getString("prenom"));
-                    System.out.println("Mail: " + testNom.getString("email"));
+                    System.out.println("id: "+" " + testNom.getInt("id"));
+                    System.out.println("Prenom: "+" " + testNom.getString("prenom"));
+                    System.out.println("Email: " +" "+ testNom.getString("email"));
+                    System.out.println("Code Postal: "+" " + testNom.getString("codepostal"));
+                    System.out.println("Mot de passe: "+" "+ testNom.getString("mdp"));
 
                 }
             }
@@ -332,16 +405,19 @@ public class GestionBD {
         try {
 
             Statement st = con.createStatement();
-            ResultSet result = st.executeQuery("Select * from utilisateur2");
+            ResultSet result = st.executeQuery("Select * from utilisateur");
 
             System.out.println("ok voici la liste des utilisateurs :");
             System.out.println("------------------------");
 
             while (result.next()) {
 
-                System.out.println("id: " + result.getInt("id"));
-                System.out.println("Nom: " + result.getString("nom"));
-                System.out.println("Prenom: " + result.getString("prenom"));
+                System.out.println("id: " +" "+ result.getInt("id"));
+                System.out.println("Nom: "+" " + result.getString("nom"));
+                System.out.println("Prenom: " +" "+ result.getString("prenom"));
+                System.out.println("Email: "+" " + result.getString("email"));
+                System.out.println("Code Postal: "+" " + result.getString("codepostal"));
+                System.out.println("Mot de passe: "+" " + result.getString("mdp"));
 
             }
         } catch (SQLException ex) {
@@ -350,13 +426,13 @@ public class GestionBD {
 
     }
 
-    public static int createCategorie(Connection con, String nom)
+    public static int createCategorieGenerale(Connection con, String nom)
             throws SQLException, CategorieExisteDejaException {
         // je me place dans une transaction pour m'assurer que la séquence
         // test du nom - création est bien atomique et isolée
         con.setAutoCommit(false);
         try ( PreparedStatement chercheCat = con.prepareStatement(
-                "select id from categorie2 where nom = ?")) {
+                "select id from categoriegenerale where nom = ?")) {
             chercheCat.setString(1, nom); //on indique ici que le premier point ? référence le mail
             ResultSet testCat = chercheCat.executeQuery();
             if (testCat.next()) {
@@ -365,9 +441,51 @@ public class GestionBD {
 
             try ( PreparedStatement pst = con.prepareStatement(
                     """
-                insert into categorie2 (nom) values (?)
+                insert into categoriegenerale (nom) values (?)
                 """, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 pst.setString(1, nom);
+                pst.executeUpdate();
+                con.commit();
+
+                // je peux alors récupérer les clés créées comme un result set :
+                try ( ResultSet rid = pst.getGeneratedKeys()) {
+                    // et comme ici je suis sur qu'il y a une et une seule clé, je
+                    // fait un simple next 
+                    rid.next();
+                    // puis je récupère la valeur de la clé créé qui est dans la
+                    // première colonne du ResultSet
+                    int id = rid.getInt(1);
+                    return id;
+                }
+            }
+        } catch (Exception ex) {
+            con.rollback();
+            throw ex;
+        } finally {
+            con.setAutoCommit(true);
+        }
+
+    }
+
+    public static int createCategorie(Connection con, String nom, int generale)
+            throws SQLException, CategorieExisteDejaException {
+        // je me place dans une transaction pour m'assurer que la séquence
+        // test du nom - création est bien atomique et isolée
+        con.setAutoCommit(false);
+        try ( PreparedStatement chercheCat = con.prepareStatement(
+                "select id from categorie where nom = ?")) {
+            chercheCat.setString(1, nom); //on indique ici que le premier point ? référence le mail
+            ResultSet testCat = chercheCat.executeQuery();
+            if (testCat.next()) {
+                throw new CategorieExisteDejaException();
+            }
+
+            try ( PreparedStatement pst = con.prepareStatement(
+                    """
+                insert into categorie(nom,generale) values (?,?)
+                """, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                pst.setString(1, nom);
+                pst.setInt(2, generale);
                 pst.executeUpdate();
                 con.commit();
 
@@ -397,22 +515,23 @@ public class GestionBD {
     public static class UtilisateurNexistePasException extends Exception {
     }
 
-    public static int createObjet(Connection con, String titre, String description, Timestamp debut, Timestamp fin, int categorie, int prixbase, int proposepar)
+    public static int createObjet(Connection con, String titre, String description, Timestamp debut, Timestamp fin, int prixbase, int proposepar, int categoriegenerale, int categorie)
             throws SQLException, CategorieNexistePasException, UtilisateurNexistePasException {
 
         con.setAutoCommit(false);
 
         try ( PreparedStatement pst = con.prepareStatement(
                 """
-                insert into objet2 (titre,description,debut,fin,proposepar,prixbase,categorie) values (?,?,?,?,?,?,?)
+                insert into objet (titre,description,debut,fin,prixbase,proposepar,categoriegenerale,categorie) values (?,?,?,?,?,?,?,?)
                 """, PreparedStatement.RETURN_GENERATED_KEYS)) {
             pst.setString(1, titre);
             pst.setString(2, description);
             pst.setTimestamp(3, debut);
             pst.setTimestamp(4, fin);
             pst.setInt(5, prixbase);
-            pst.setInt(6, categorie);
-            pst.setInt(7, proposepar);
+            pst.setInt(6, proposepar);
+            pst.setInt(7, categoriegenerale);
+            pst.setInt(8, categorie);
 
             pst.executeUpdate();
 
@@ -443,7 +562,7 @@ public class GestionBD {
 
         try ( PreparedStatement pst = con.prepareStatement(
                 """
-                insert into enchere2 (quand,montant,sur,de) values (?,?,?,?)
+                insert into enchere (quand,montant,sur,de) values (?,?,?,?)
                 """, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
             pst.setTimestamp(1, quand);
@@ -478,7 +597,7 @@ public class GestionBD {
     public static class DelaiDEnchereDepasseException extends Exception {
     }
 
-    public static void demandeEnchere(Connection con, String titreobj, int offre, String nomuser) throws SQLException, UtilisateurNexistePasException, ObjetNexistePasException, MontantTropPetitException, DelaiDEnchereDepasseException {
+    public static void demandeEnchere(Connection con, String titreobj, int offre, String emailuser) throws SQLException, UtilisateurNexistePasException, ObjetNexistePasException, MontantTropPetitException, DelaiDEnchereDepasseException {
         boolean existe = true;
         while (existe) {
 
@@ -489,7 +608,7 @@ public class GestionBD {
             Timestamp quand = new Timestamp(System.currentTimeMillis());
 
             try ( PreparedStatement chercheObj = con.prepareStatement( //on vérifie que l'objet sur lequel on veut faire l'enchere est bien dans la bdd
-                    "select id from objet2 where titre = ?")) {
+                    "select id from objet where titre = ?")) {
 
                 chercheObj.setString(1, titreobj);
                 ResultSet testObj = chercheObj.executeQuery();
@@ -506,9 +625,9 @@ public class GestionBD {
             }
 
             try ( PreparedStatement chercheUser = con.prepareStatement( //on vérifie que l'utilisateur est bien dans la bdd
-                    "select id from utilisateur2 where nom = ?")) {
+                    "select id from utilisateur where email = ?")) {
 
-                chercheUser.setString(1, nomuser);
+                chercheUser.setString(1, emailuser);
                 ResultSet testUser = chercheUser.executeQuery();
 
                 if (testUser.next()) {
@@ -525,7 +644,7 @@ public class GestionBD {
 
             try ( PreparedStatement chercheQuand = con.prepareStatement( //on s'assure que le délai de l'enchere n'est pas dépassé
                     """
-                select fin from objet2 
+                select fin from objet 
                 where titre=?
                
                 """
@@ -556,8 +675,8 @@ public class GestionBD {
             try (
                      PreparedStatement chercheMontant = con.prepareStatement( //on s'occupe de la contrainte de l'enchere faite doit etre supérieure au max ou au prix base
                             """
-                select prixbase, montant from enchere2, objet2 where montant = 
-                            (select max(montant) from enchere2 where sur = (select id from objet2 where titre = ? )) 
+                select montant from enchere, objet where montant = 
+                            (select max(montant) from enchere where sur = (select id from objet where titre = ? )) 
                
                 """
                     )) {
@@ -569,7 +688,7 @@ public class GestionBD {
 
                             max = testMontant.getInt("montant");
 
-                            if (max >= offre) {
+                            if (offre <= max) {
 
                                 throw new MontantTropPetitException();
                             } else {
@@ -580,7 +699,7 @@ public class GestionBD {
                         } else {
                             PreparedStatement cherchePrixBase = con.prepareStatement(
                                     """
-                select prixbase from objet2 where titre = ? 
+                select prixbase from objet where titre = ? 
                
                 """
                             );
@@ -608,15 +727,15 @@ public class GestionBD {
                         createEnchere(con, quand, sur, de, offre); //maintenant on ajoute l'enchere si toute les conditions sont respectées
 
                         existe = false;
-                    } catch (SQLException ex) {
-
-                    }
-
-        }
+                    } catch (SQLException ex ) {
+                        
+                    } 
+        
 
     }
+    }
 
-    public static void demandeObjet(Connection con, String titre, String description, int prixbase, int annee, int mois, int date, String Fin, String nomcat, String nomuser) throws SQLException, UtilisateurNexistePasException, CategorieNexistePasException {
+    public static void demandeObjet(Connection con, String titre, String description, int prixbase, int annee, int mois, int date, String Fin, String nomcatgen, String nomcat, String emailuser) throws SQLException, UtilisateurNexistePasException, CategorieNexistePasException {
 
         boolean existe = true;
         while (existe) {
@@ -625,16 +744,18 @@ public class GestionBD {
             Timestamp fin = Timestamp.valueOf(Fin); //valueof convertit un string en si on veut valeur d'une horloge
 
             int categorie = -1;
+            int categoriegenerale = -1;
             int proposepar = -1;
 
-            try ( PreparedStatement chercheCat = con.prepareStatement( //ici on récupère l'id de la cat correspondante
-                    "select id from categorie2 where nom = ?")) {
+            try ( PreparedStatement chercheCatGen = con.prepareStatement( //ici on récupère l'id de la cat correspondante
+                    "select id from categoriegenerale where nom = ?")) {
 
-                chercheCat.setString(1, nomcat);
-                ResultSet testCat = chercheCat.executeQuery();
+                chercheCatGen.setString(1, nomcatgen);
 
-                if (testCat.next()) {
-                    categorie = testCat.getInt("id");
+                ResultSet testCatGen = chercheCatGen.executeQuery();
+
+                if (testCatGen.next()) {
+                    categoriegenerale = testCatGen.getInt("id");
 
                 } else {
                     throw new CategorieNexistePasException();
@@ -644,14 +765,34 @@ public class GestionBD {
                 System.out.println(" la catégorie voulue n'existe pas, retournez dans le menu la créer");
             }
 
-            try ( PreparedStatement chercheUs = con.prepareStatement(
-                    "select id from utilisateur2 where nom = ?")) {
+            try ( PreparedStatement chercheCat = con.prepareStatement( //ici on récupère l'id de la cat correspondante
+                    "select id from categorie where nom = ?")) {
 
-                chercheUs.setString(1, nomuser);
+                chercheCat.setString(1, nomcat);
+                ResultSet testCat = chercheCat.executeQuery();
+
+                if (testCat.next()) {
+                    categorie = testCat.getInt("id");
+
+                
+                } else {
+                    throw new CategorieNexistePasException();
+
+                }
+            } catch (CategorieNexistePasException ex) {
+                System.out.println(" la catégorie voulue n'existe pas, retournez dans le menu la créer");
+            }
+            
+
+            try ( PreparedStatement chercheUs = con.prepareStatement(
+                    "select id from utilisateur where email = ?")) {
+
+                chercheUs.setString(1, emailuser);
                 ResultSet testUs = chercheUs.executeQuery();
                 if (testUs.next()) {
 
                     proposepar = testUs.getInt("id");
+
                 } else {
                     throw new UtilisateurNexistePasException();
                 }
@@ -661,7 +802,7 @@ public class GestionBD {
             }
 
             try {
-                createObjet(con, titre, description, debut, fin, prixbase, proposepar, categorie);
+                createObjet(con, titre, description, debut, fin, prixbase, proposepar, categoriegenerale, categorie);
 
                 existe = false;
             } catch (SQLException ex) {
@@ -672,12 +813,12 @@ public class GestionBD {
 
     }
 
-    public static void demandeCategorie(Connection con, String nomcat) throws SQLException, CategorieExisteDejaException { //entrer manuellement de nouvelles categories
+    public static void demandeCategorieGenerale(Connection con, String nomcat) throws SQLException, CategorieExisteDejaException { //entrer manuellement de nouvelles categories
         boolean existe = true;
         while (existe) {
 
             try {
-                createCategorie(con, nomcat);
+                createCategorieGenerale(con, nomcat);
                 existe = false;
             } catch (CategorieExisteDejaException ex) {
                 System.out.println("Categorie deja existante, cherchez bien!");
@@ -685,13 +826,45 @@ public class GestionBD {
         }
     }
 
-    public static void TrouveObjetCat(Connection con, String nom) throws SQLException {
+    public static void demandeCategorie(Connection con, String nomcat, String nomcatgen) throws SQLException, CategorieExisteDejaException { //entrer manuellement de nouvelles categories
+        boolean existe = true;
+        while (existe) {
+
+            int generale = -1;
+
+            try ( PreparedStatement chercheCat = con.prepareStatement( //ici on récupère l'id de la cat correspondante
+                    "select id from categoriegenerale where nom = ?")) {
+
+                chercheCat.setString(1, nomcatgen);
+                ResultSet testCat = chercheCat.executeQuery();
+
+                if (testCat.next()) {
+                    generale = testCat.getInt("id");
+
+                } else {
+                    throw new CategorieNexistePasException();
+
+                }
+            } catch (CategorieNexistePasException ex) {
+                System.out.println(" la catégorie generale voulue n'existe pas, retournez dans le menu la créer");
+            }
+
+            try {
+                createCategorie(con, nomcat, generale);
+                existe = false;
+            } catch (CategorieExisteDejaException ex) {
+                System.out.println("Categorie deja existante, cherchez bien!");
+            }
+        }
+    }
+
+    public static void TrouveObjetCatGen(Connection con, String nom) throws SQLException {
         con.setAutoCommit(false);
         try ( PreparedStatement searchobjet = con.prepareStatement(
                 """
-         select objet2.id, titre, description, debut, fin, prixbase
-                         from objet2 join categorie2 on objet2.categorie = categorie2.id
-                         where categorie2.nom = ?
+         select objet.id, titre, description, debut, fin, prixbase
+                         from objet join categoriegenerale on objet.categoriegenerale = categoriegenerale.id
+                         where categoriegenerale.nom = ?
                          order by titre asc
         
         """
@@ -702,12 +875,43 @@ public class GestionBD {
 
             while (rs.next()) {
 
-                System.out.println("voici les infos pour l'objet d'identifiant :" + rs.getInt("id"));
-                System.out.println("titre: " + rs.getString("titre"));
-                System.out.println("description: " + rs.getString("description"));
-                System.out.println("date de mise en enchere: " + rs.getTimestamp("debut"));
-                System.out.println("date de fin de la mise en enchere: " + rs.getTimestamp("fin"));
-                System.out.println("le prix de base est de: " + rs.getInt("prixbase") + "euros");
+                System.out.println("voici les infos pour l'objet d'identifiant :"+" " + rs.getInt("id"));
+                System.out.println("titre: " +" "+ rs.getString("titre"));
+                System.out.println("description: "+" " + rs.getString("description"));
+                System.out.println("date de mise en enchere: "+" " + rs.getTimestamp("debut"));
+                System.out.println("date de fin de la mise en enchere: "+" " + rs.getTimestamp("fin"));
+                System.out.println("le prix de base est de: " +" "+ rs.getInt("prixbase") + "euros");
+
+            }
+
+        } catch (SQLException ex) {
+            throw new Error(ex);
+        }
+    }
+    
+        public static void TrouveObjetCat(Connection con, String nom) throws SQLException {
+        con.setAutoCommit(false);
+        try ( PreparedStatement searchobjet = con.prepareStatement(
+                """
+         select objet.id, titre, description, debut, fin, prixbase
+                         from objet join categorie on objet.categorie = categorie.id
+                         where categorie.nom = ?
+                         order by titre asc
+        
+        """
+        )) {
+
+            searchobjet.setString(1, nom); //on indique ici que le premier point ? référence le nom
+            ResultSet rs = searchobjet.executeQuery();
+
+            while (rs.next()) {
+
+                System.out.println("voici les infos pour l'objet d'identifiant :"+" " + rs.getInt("id"));
+                System.out.println("titre: " +" "+ rs.getString("titre"));
+                System.out.println("description: "+" " + rs.getString("description"));
+                System.out.println("date de mise en enchere: " +" "+ rs.getTimestamp("debut"));
+                System.out.println("date de fin de la mise en enchere: " +" "+ rs.getTimestamp("fin"));
+                System.out.println("le prix de base est de: "+" " + rs.getInt("prixbase") + "euros");
 
             }
 
@@ -720,7 +924,7 @@ public class GestionBD {
         con.setAutoCommit(false);
         try ( PreparedStatement searchobjett = con.prepareStatement(
                 """
-         select * from objet2 where description like ?
+         select * from objet where description like ?
                          order by titre asc
         
         """
@@ -731,12 +935,12 @@ public class GestionBD {
 
             while (rs.next()) {
 
-                System.out.println("voici les infos pour l'objet d'identifiant :" + rs.getInt("id"));
-                System.out.println("titre: " + rs.getString("titre"));
-                System.out.println("description: " + rs.getString("description"));
-                System.out.println("date de mise en enchere: " + rs.getTimestamp("debut"));
-                System.out.println("date de fin de la mise en enchere: " + rs.getTimestamp("fin"));
-                System.out.println("le prix de base est de: " + rs.getInt("prixbase") + "euros");
+                System.out.println("voici les infos pour l'objet d'identifiant :"+" " + rs.getInt("id"));
+                System.out.println("titre: "+" " + rs.getString("titre"));
+                System.out.println("description: "+" " + rs.getString("description"));
+                System.out.println("date de mise en enchere: " +" "+ rs.getTimestamp("debut"));
+                System.out.println("date de fin de la mise en enchere: " +" "+ rs.getTimestamp("fin"));
+                System.out.println("le prix de base est de: " +" "+ rs.getInt("prixbase") + " " + "euros");
 
             }
 
@@ -745,19 +949,21 @@ public class GestionBD {
         }
     }
 
-    public static void BilanUser(Connection con, String nomuser) throws SQLException { //il manque une vérification de si l'utilisateur existe vraiment ou pas
+    public static void mesObjets(Connection con, String emailuser) throws SQLException { //il manque une vérification de si l'utilisateur existe vraiment ou pas
 
         con.setAutoCommit(false);
         try ( PreparedStatement searchuser = con.prepareStatement(
                 """
                
-                select utilisateur2.id, nom, prenom, email, titre, fin  from utilisateur2,objet2 where utilisateur2.id=objet2.proposepar
-                and nom=?
+                select objet.id, prenom, titre, description, debut, fin, prixbase from utilisateur,objet 
+                where utilisateur.id=objet.proposepar
+                and email=?
+                order by debut asc
                                                                   
                 """
         )) {
-            
-            searchuser.setString(1, nomuser); //on indique ici que le premier point ? référence le nom
+
+            searchuser.setString(1, emailuser); //on indique ici que le premier point ? référence le nom
             ResultSet testNom = searchuser.executeQuery();
 
             boolean exist = false;
@@ -768,12 +974,57 @@ public class GestionBD {
 
                 if (exist == true) {
 
-                    System.out.println("voici les infos de l'utilisateur nommé:" + testNom.getString("nom"));
-                    System.out.println("id: " + testNom.getInt("id"));
-                    System.out.println("prenom: " + testNom.getString("prenom"));
-                    System.out.println("son mail: " + testNom.getString("email"));
-                    System.out.println("Les titres des objets qu'il a proposé en enchere: " + testNom.getString("titre"));
-                    System.out.println("Leur date de fin d'enchere: " + testNom.getTimestamp("fin"));
+                    System.out.println("Bonjour" + " "+ testNom.getString("prenom")+"!");
+                    System.out.println("Voici les objets que vous avez mis en enchere:");
+                    System.out.println("L'objet d'identifiant : " + " "+ testNom.getInt("id"));
+                    System.out.println("Le titre donné est: " +" "+ testNom.getString("titre"));
+                    System.out.println("La description entrée est: " +" "+ testNom.getString("description"));
+                    System.out.println("Vous l'avez mis en enchere le: "+" " + testNom.getTimestamp("debut"));
+                    System.out.println("Pour une date de fin d'enchere prévue le: " +" "+ testNom.getTimestamp("fin"));
+                    System.out.println("Et un prix initial de : " + " "+ testNom.getInt("prixbase"));
+                    
+
+                }
+            }
+        } catch (SQLException ex) {
+            throw new Error(ex);
+        }
+
+    }
+    
+    public static void mesEncheres(Connection con, String emailuser) throws SQLException { //il manque une vérification de si l'utilisateur existe vraiment ou pas
+
+        con.setAutoCommit(false);
+        try ( PreparedStatement searchuser = con.prepareStatement(
+                """
+               
+                select objet.id, prenom, titre, quand, fin, montant from utilisateur, objet, enchere 
+                where utilisateur.id=enchere.de and enchere.sur = objet.id
+                and email=?
+                order by quand asc
+                                                                  
+                """
+        )) {
+
+            searchuser.setString(1, emailuser); //on indique ici que le premier point ? référence le nom
+            ResultSet testNom = searchuser.executeQuery();
+
+            boolean exist = false;
+            while (testNom.next()) { //je vérifie que le nom est bien dans la base de données
+                //le resultset est un peu comme un tableau quicontient l'ensemble des résultats de ta requete
+                //quand tu fais next le pointeur va sur une autre case mais au début il est avant la première ligne
+                exist = true;
+
+                if (exist == true) {
+
+                    System.out.println("Bonjour" + " "+ testNom.getString("prenom")+"!");
+                    System.out.println("Voici les objets sur lesquels vous avez posé une enchere:");
+                    System.out.println("L'objet d'identifiant : " + " "+ testNom.getInt("id"));
+                    System.out.println("Le titre est: " +" "+ testNom.getString("titre"));
+                    System.out.println("La date de fin d'enchere est prévue pour le: " +" "+ testNom.getTimestamp("fin"));
+                    System.out.println("Vous avez posé votre enchere le: "+" " + testNom.getTimestamp("quand"));
+                    System.out.println("Et d'un montant de: " + " "+ testNom.getInt("montant")+ " " +"euros");
+                    
 
                 }
             }
@@ -789,7 +1040,7 @@ public class GestionBD {
         // test du nom - création est bien atomique et isolée
         con.setAutoCommit(false);
         try ( PreparedStatement cherchetitre = con.prepareStatement(
-                "select id from objet2 where titre = ?")) { //seul le mail doit etre unique pour notre bdd
+                "select id from objet where titre = ?")) { //seul le mail doit etre unique pour notre bdd
             cherchetitre.setString(1, titre); //on indique ici que le premier point ? référence le mail
             ResultSet testTitre = cherchetitre.executeQuery();
             if (testTitre.next()) {
@@ -801,7 +1052,7 @@ public class GestionBD {
 
             try ( PreparedStatement pst = con.prepareStatement(
                     """
-               UPDATE objet2
+               UPDATE objet
                SET fin = ?
                WHERE titre = ?
                 """)) {
@@ -840,7 +1091,7 @@ public class GestionBD {
     public static void TrouveidCategorie(Connection con, String nomcat) throws SQLException, CategorieNexistePasException {
 
         con.setAutoCommit(false);
-        try ( PreparedStatement searchcat = con.prepareStatement("select idfrom categorie2 where nom = ?")) {
+        try ( PreparedStatement searchcat = con.prepareStatement("select id from categorie where nom = ?")) {
 
             searchcat.setString(1, nomcat); //on indique ici que le premier point ? référence le nom
             ResultSet testCat = searchcat.executeQuery();
@@ -862,6 +1113,43 @@ public class GestionBD {
         }
 
     }
+    
+    public static void afficheEnchere(Connection con, String nomobjet) throws SQLException{
+        
+         con.setAutoCommit(false);
+        try ( PreparedStatement searchobjet = con.prepareStatement(
+                """
+         select enchere.id, quand, montant,de
+                         from enchere join objet on enchere.sur = objet.id
+                         where objet.titre = ?
+                         order by quand asc
+        
+        """
+        )) {
+
+            searchobjet.setString(1, nomobjet); //on indique ici que le premier point ? référence le nom
+            ResultSet rs = searchobjet.executeQuery();
+
+            while (rs.next()) {
+
+                System.out.println("voici l'ensemble des encheres faites sur cet objet:");
+                System.out.println("Enchere numéro: " + rs.getInt("id"));
+                System.out.println("Faite le: " + rs.getTimestamp("quand"));
+                System.out.println("D'un montant de: " + rs.getInt("montant") + "euros");
+                System.out.println("Par l'utilisateur d'identifiant: " + rs.getInt("de"));
+                
+
+            }
+
+        } catch (SQLException ex) {
+            throw new Error(ex);
+        }
+    }
+        
+        
+        
+        
+    }
 
 //    public static void main(String[] args) {
 //        try ( Connection con = defautConnect()) {
@@ -872,4 +1160,4 @@ public class GestionBD {
 //            throw new Error(ex);
 //        }
 //    }
-}
+
