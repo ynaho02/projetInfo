@@ -5,19 +5,23 @@
  */
 package com.mycompany.projetinfo;
 
-import static com.mycompany.projetinfo.GestionBD.BilanUser;
-import static com.mycompany.projetinfo.GestionBD.TrouveObjetCat;
-import static com.mycompany.projetinfo.GestionBD.TrouveObjetMot;
-import static com.mycompany.projetinfo.GestionBD.TrouveUtilisateurNom;
-import static com.mycompany.projetinfo.GestionBD.TrouveidCategorie;
+
+import static com.mycompany.projetinfo.GestionBD.trouveObjetMot;
+import static com.mycompany.projetinfo.GestionBD.afficheEnchere;
 import static com.mycompany.projetinfo.GestionBD.afficheUsers;
 import static com.mycompany.projetinfo.GestionBD.creeSchema;
 import static com.mycompany.projetinfo.GestionBD.defautConnect;
 import static com.mycompany.projetinfo.GestionBD.deleteSchema;
+import static com.mycompany.projetinfo.GestionBD.demandeCategorie;
 import static com.mycompany.projetinfo.GestionBD.demandeUpdateFin;
+import static com.mycompany.projetinfo.GestionBD.login;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import static com.mycompany.projetinfo.GestionBD.trouveObjetCat;
+import static com.mycompany.projetinfo.GestionBD.trouveObjetCatGen;
+import static com.mycompany.projetinfo.GestionBD.trouveUtilisateurNom;
+import static com.mycompany.projetinfo.GestionBD.trouveidCategorie;
 
 /**
  *
@@ -40,11 +44,18 @@ public class MainApp {
         int m = -1;
 
         char u = 0;
+        
+        System.out.println("Bienvenue sur le site de vente aux encheres!"); 
+            System.out.println("S'il vous plait veuillez vous connecter"); 
+             System.out.println("Entrez votre adresse mail:");
+                            String mail = Lire.S();
+                            System.out.println("Entrez votre un mot de passe:");
+                            String mdp = Lire.S();
+                            login(con, mail, mdp);
 
         while (u != 'o') {
 
-            System.out.println("Bienvenue dans le menu de votre base de données!"); //différents menus en fonction  de la table à laquellle tu veux accéder
-            System.out.println("Voici les instructions:");
+            System.out.println("Bienvenue dans le menu BdD!");
             System.out.println("Entrez (a) si votre requete concerne un ensemble de tables");
             System.out.println("Entrez (b) si votre requete concerne la table utilisateur");
             System.out.println("Entrez (c) si votre requete concerne la table objet");
@@ -92,40 +103,60 @@ public class MainApp {
                     while (m != 0) {
                         System.out.println("Bienvenue dans le menu utilisateur !");
                         System.out.println("Voici vos options");
-                        //System.out.println("(1) Se connecter");
-                        System.out.println("(1) Ajouter un utilisateur");
-                        System.out.println("(2) Retrouver un utilisateur en entrant son nom");
-                        System.out.println("(3) Afficher la liste de tous les utilisateurs");
-                        System.out.println("(4) Afficher un bilan pour un utilisateur donné"); //pas fait correctement
+                        System.out.println("(1) Se connecter");
+                        System.out.println("(2) Ajouter un utilisateur");
+                        System.out.println("(3) Retrouver un utilisateur en entrant son nom");
+                        System.out.println("(4) Afficher la liste de tous les utilisateurs");
+                        System.out.println("(5) Afficher l'ensemble des encheres que vous avez mis en enchere");
+                        System.out.println("(6) Afficher l'ensemble des encheres faites par un utilisateur donné"); //pas fait correctement
                         System.out.println("(0) Quitter le menu");
                         System.out.println("Entrez votre choix");
                         m = Lire.i();
+                        
+                        if (m==1){
+                            
+                            System.out.println("Entrez votre adresse mail:");
+                            String email = Lire.S();
+                            System.out.println("Entrez votre un mot de passe:");
+                            String mdep = Lire.S();
+                            login(con, email, mdep);
+                        }
 
-                        if (m == 1) {
+                        if (m == 2) {
                             System.out.println("--- creation nouvel utilisateur");
                             System.out.println("Entrez votre nom, votre prénom et votre mail");
                             String nom = Lire.S();
                             String prenom = Lire.S();
-                            String email = Lire.S();
-                            GestionBD.demandeUtilisateur(con, nom, prenom, email);
+                            String admail = Lire.S();
+                            System.out.println("Entrez un mot de passe:");
+                            String pass = Lire.S();
+                            System.out.println("Entrez le code postal correspondant à votre adresse d'habitation:");
+                            String codepostal = Lire.S();
+                            GestionBD.demandeUtilisateur(con, nom, prenom, admail, pass, codepostal);
                             System.out.println("Utilisateur ajouté avec succès.");
                         }
 
-                        if (m == 2) {
-                            System.out.println("entrez le nom de l'utilisateur recherché");
-                            String nomuser = Lire.S();
-                            TrouveUtilisateurNom(con, nomuser);
+                        if (m == 3) {
+                            System.out.println("entrez le mail de l'utilisateur recherché");
+                            String tonmail = Lire.S();
+                            trouveUtilisateurNom(con, tonmail);
                         }
 
-                        if (m == 3) {
+                        if (m == 4) {
 
                             afficheUsers(con);
                         }
 
-                        if (m == 4) {
-                            System.out.println("entrez le nom de l'utilisateur pour qui vous voulez le bilan");
-                            String nomuser = Lire.S();
-                            BilanUser(con, nomuser);
+                        if (m == 5) {
+                            System.out.println("entrez votre adresse mail");
+                            String emailuser = Lire.S();
+                            GestionBD.mesObjets(con, emailuser);
+                        }
+                        
+                         if (m == 6) {
+                            System.out.println("entrez votre adresse mail");
+                            String emailuser = Lire.S();
+                            GestionBD.mesEncheres(con, emailuser);
                         }
 
                         if (m == 0) {
@@ -143,9 +174,10 @@ public class MainApp {
                         System.out.println("Bienvenue dans le menu objet!");
                         System.out.println("Voici vos options");
                         System.out.println("(1) Ajouter un nouvel objet");
-                        System.out.println("(2) Chercher un objet en entrant une catégorie");
-                        System.out.println("(3) Chercher un objet en entrant une brève description (un mot)"); //pas fait
-                        System.out.println("(4) Modifier la date de fin d'enchere d'un objet");
+                        System.out.println("(2) Chercher un objet en entrant une catégorie générale");
+                        System.out.println("(3) Chercher un objet en entrant une sous-catégorie");
+                        System.out.println("(4) Chercher un objet en entrant une brève description (un mot)"); 
+                        System.out.println("(5) Modifier la date de fin d'enchere d'un objet");
                         System.out.println("(0) Quitter le menu");
                         System.out.println("Entrez votre choix");
                         m = Lire.i();
@@ -180,11 +212,15 @@ public class MainApp {
                             String Fin = annee + "-" + mois + "-" + date + " " + heure + ":" + minute + ":" + seconde; //je crée un string de format exact à ce à quoi est sensé ressembler un timestamp
 
                             System.out.println("A present vous allez attribuer une catégorie à votre objet, entrez le nom de cette categorie ");
+                            String nomcatgen = Lire.S();
+                            
+                            System.out.println("Votre objet appartient à une sous-catégorie spécifique, veuillez l'entrez.");
                             String nomcat = Lire.S();
-
-                            System.out.println("A present il faut vous associer à cet objet, entrez donc votre nom ");
-                            String nomuser = Lire.S();
-                            GestionBD.demandeObjet(con, titre, description, prixbase, annee, mois, date, Fin, nomcat, nomuser);
+                            
+                            System.out.println("A present il faut vous associer à cet objet, entrez donc votre adresse mail.");
+                            String emailuser = Lire.S();
+                            
+                            GestionBD.demandeObjet(con, titre, description, prixbase, annee, mois, date, Fin, nomcatgen, nomcat, emailuser);
 
                             System.out.println("Objet ajouté avec succès.");
 
@@ -193,16 +229,22 @@ public class MainApp {
                         if (m == 2) {
                             System.out.println("Entrez la catégorie d'objet que vous recherchez");
                             String nom = Lire.S();
-                            TrouveObjetCat(con, nom);
+                            trouveObjetCatGen(con, nom);
                         }
-
-                        if (m == 3) {
-                            System.out.println("Entrez un mot clé pour chercher des objets correspondants");
-                            String mot = Lire.S();
-                            TrouveObjetMot(con, mot);
+                        
+                          if (m == 3) {
+                            System.out.println("Entrez la sous-catégorie d'objet que vous recherchez");
+                            String nom = Lire.S();
+                            trouveObjetCat(con, nom);
                         }
 
                         if (m == 4) {
+                            System.out.println("Entrez un mot clé pour chercher des objets correspondants");
+                            String mot = Lire.S();
+                            trouveObjetMot(con, mot);
+                        }
+
+                        if (m == 5) {
 
                             System.out.println("--- modification date de fin de mise en enchere");
 
@@ -242,24 +284,39 @@ public class MainApp {
                     while (m != 0) {
                         System.out.println("Bienvenue dans le menu categorie!");
                         System.out.println("Voici vos options");
-                        System.out.println("(1) Ajouter une nouvelle categorie");
-                        System.out.println("(2) Retrouver l'identifiant d'une catégorie");
+                        System.out.println("(1) Ajouter une nouvelle categorie générale");
+                        System.out.println("(2) Ajouter une nouvelle sous catégorie");
+                        System.out.println("(3) Afficher toutes les catégories générales et leurs sous-catégories");
+                        System.out.println("(4) Retrouver l'identifiant d'une catégorie");
                         System.out.println("(0) Quitter le menu");
                         System.out.println("Entrez votre choix");
                         m = Lire.i();
 
                         if (m == 1) {
-                            System.out.println("--- creation nouvelle categorie");
-                            System.out.println("Entrez le nom de la categorie");
+                            System.out.println("--- creation nouvelle categorie générale");
+                            System.out.println("Entrez le nom de la categorie générale");
                             String nomcat = Lire.S();
-                            GestionBD.demandeCategorie(con, nomcat);
+                            GestionBD.demandeCategorieGenerale(con, nomcat);
                             System.out.println("Catégorie ajoutée avec succès");
                         }
+                        
+                        if (m==2){
+                            System.out.println("--- creation nouvelle sous-catégorie");
+                            System.out.println("Entrez le nom de la sous-catégorie");
+                            String nomcat = Lire.S();
+                            System.out.println("Entrez le nom de sa categorie générale");
+                            String nomcatgen = Lire.S();
+                            demandeCategorie(con,nomcat, nomcatgen);
+                            System.out.println("Sous-catégorie ajoutée avec succès.");
+                            
+                            
+                            
+                        }
 
-                        if (m == 2) {
+                        if (m == 3) {
                             System.out.println("entrez le nom de la categorie recherchée");
                             String nomcat = Lire.S();
-                            TrouveidCategorie(con, nomcat);
+                            trouveidCategorie(con, nomcat);
 
                         }
 
@@ -279,7 +336,6 @@ public class MainApp {
                         System.out.println("Voici vos options");
                         System.out.println("(1) Ajouter une nouvelle enchere sur un objet donné"); //pas réussi
                         System.out.println("(2) Afficher l'ensemble des encheres faites sur un objet donné"); //pas encore fait
-                        System.out.println("(3) Afficher l'ensemble des encheres"); //pas encore fait
                         System.out.println("(0) Quitter le menu");
                         System.out.println("Entrez votre choix");
                         m = Lire.i();
@@ -293,14 +349,17 @@ public class MainApp {
                             System.out.println("Entrez le montant de votre offre:");
                             int offre = Lire.i();
 
-                            System.out.println("A present vous allez vous identifier à votre enchere, entrez votre nom:");
-                            String nomuser = Lire.S();
-                            GestionBD.demandeEnchere(con, titreobj, offre, nomuser); //demandeEnchere
+                            System.out.println("A present vous allez vous identifier à votre enchere, entrez votre adresse mail:");
+                            String emailuser = Lire.S();
+                            GestionBD.demandeEnchere(con, titreobj, offre, emailuser); //demandeEnchere
                         }
 
                         if (m == 2) {
 
-                            //TrouveUtilisateurNom(con);//trouvecategorie
+                            System.out.println("Entrez le nom de l'objet concerné");
+                            String nomobjet= Lire.S();
+                            afficheEnchere(con, nomobjet);
+                          
                         }
 
                         if (m == 0) {
@@ -316,17 +375,7 @@ public class MainApp {
                     System.out.println("eh bien dégagez alors!");
                 }
 
-//                if (m == 0) {
-//
-//                    System.out.println("Bienvenue dans le menu de votre base de données!");
-//                    System.out.println("Voici les instructions:");
-//                    System.out.println("Entrez (a) si votre requete concerne un ensemble de tables");
-//                    System.out.println("Entrez (b) si votre requete concerne la table utilisateur");
-//                    System.out.println("Entrez (c) si votre requete concerne la table objet");
-//                    System.out.println("Entrez (d) si votre requete concerne la table categorie");
-//                    System.out.println("Entrez (e) si votre requete concerne la table enchere");
-//                    System.out.println("Entrez (o) si vous avez rien à foutre ici");
-//                }
+              
             } catch (SQLException ex) {
                 throw new Error(ex);
             }
