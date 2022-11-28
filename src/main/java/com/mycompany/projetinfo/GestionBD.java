@@ -369,7 +369,7 @@ public class GestionBD {
         }
     }
 
-    public static void TrouveUtilisateurNom(Connection con, String mail) throws SQLException { //choisir un utilisateur à partir de son nom et renvoyer ses infos
+    public static void trouveUtilisateurNom(Connection con, String mail) throws SQLException { //choisir un utilisateur à partir de son nom et renvoyer ses infos
 
         con.setAutoCommit(false);
         try ( PreparedStatement searchuser = con.prepareStatement("select * from utilisateur where email = ?")) {
@@ -858,7 +858,7 @@ public class GestionBD {
         }
     }
 
-    public static void TrouveObjetCatGen(Connection con, String nom) throws SQLException {
+    public static void trouveObjetCatGen(Connection con, String nom) throws SQLException {
         con.setAutoCommit(false);
         try ( PreparedStatement searchobjet = con.prepareStatement(
                 """
@@ -889,7 +889,7 @@ public class GestionBD {
         }
     }
     
-        public static void TrouveObjetCat(Connection con, String nom) throws SQLException {
+        public static void trouveObjetCat(Connection con, String nom) throws SQLException {
         con.setAutoCommit(false);
         try ( PreparedStatement searchobjet = con.prepareStatement(
                 """
@@ -920,7 +920,7 @@ public class GestionBD {
         }
     }
 
-    public static void TrouveObjetMot(Connection con, String mot) throws SQLException {
+    public static void trouveObjetMot(Connection con, String mot) throws SQLException {
         con.setAutoCommit(false);
         try ( PreparedStatement searchobjett = con.prepareStatement(
                 """
@@ -1034,7 +1034,7 @@ public class GestionBD {
 
     }
 
-    public static void UpdateObjetFin(Connection con, String titre, Timestamp fin)
+    public static void updateObjetFin(Connection con, String titre, Timestamp fin)
             throws SQLException, ObjetNexistePasException {
         // je me place dans une transaction pour m'assurer que la séquence
         // test du nom - création est bien atomique et isolée
@@ -1079,7 +1079,7 @@ public class GestionBD {
 
             Timestamp fin = Timestamp.valueOf(Fin); //valueof convertit un string en si on veut valeur d'une horloge;
             try {
-                UpdateObjetFin(con, Titre, fin);
+                updateObjetFin(con, Titre, fin);
                 existe = false;
             } catch (ObjetNexistePasException ex) {
                 System.out.println("cet objet n'existe pas désolé");
@@ -1088,7 +1088,7 @@ public class GestionBD {
 
     }
 
-    public static void TrouveidCategorie(Connection con, String nomcat) throws SQLException, CategorieNexistePasException {
+    public static void trouveidCategorie(Connection con, String nomcat) throws SQLException, CategorieNexistePasException {
 
         con.setAutoCommit(false);
         try ( PreparedStatement searchcat = con.prepareStatement("select id from categorie where nom = ?")) {
@@ -1145,6 +1145,38 @@ public class GestionBD {
             throw new Error(ex);
         }
     }
+    
+    public static void login(Connection con, String mail, String mdp) throws SQLException { //choisir un utilisateur à partir de son nom et renvoyer ses infos
+
+        con.setAutoCommit(false);
+        try ( PreparedStatement searchuser = con.prepareStatement("select * from utilisateur where email=? and mdp = ?")) {
+
+            searchuser.setString(1, mail);
+            searchuser.setString(2, mdp);//on indique ici que le premier point ? référence le nom
+            ResultSet testNom = searchuser.executeQuery();
+
+            boolean exist = false;
+            if(testNom.next()) { //je vérifie que le nom est bien dans la base de données
+                //le resultset est un peu comme un tableau quicontient l'ensemble des résultats de ta requete
+                //quand tu fais next le pointeur va sur une autre case mais au début il est avant la première ligne
+                exist = true;
+
+                if (exist == true) {
+
+                   System.out.println("Login successful");
+
+                }
+            }
+       
+            
+        } catch (Exception ex) {
+            con.rollback();
+            throw ex;
+        } finally {
+            con.setAutoCommit(true);
+        }
+
+    }
         
         
         
@@ -1155,7 +1187,7 @@ public class GestionBD {
 //        try ( Connection con = defautConnect()) {
 //            System.out.println("connection réussie");
 ////            demandeEnchere(con);
-//            TrouveObjetMot(con);
+//            trouveObjetMot(con);
 //        } catch (Exception ex) {
 //            throw new Error(ex);
 //        }
