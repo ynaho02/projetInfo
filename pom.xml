@@ -71,7 +71,7 @@
                     <stripDebug>true</stripDebug>
                     <noManPages>true</noManPages>
 <!-- A MODIFIER-->
-                    <mainClass>com.mycompany.projetinfo.vueFX.Main</mainClass>
+                    <mainClass>fr.insa.mariannie.infom3.GraphUserInterface</mainClass>
                     <launcher>TutoVideoDessin</launcher>
                     <jlinkImageName>amourFX</jlinkImageName>
                     <!-- pour zipper le dossier image

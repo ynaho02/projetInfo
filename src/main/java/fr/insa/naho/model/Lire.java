@@ -1,4 +1,4 @@
-package com.mycompany.projetinfo;
+package fr.insa.naho.model;
 
 import java.io.*;
 
