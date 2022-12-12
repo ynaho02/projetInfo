@@ -10,6 +10,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 
 
@@ -18,24 +19,25 @@ import javafx.scene.layout.VBox;
  *
  * @author alexa
  */
-public class PageBienvenue extends BorderPane{
+public class VueGlobale extends GridPane{
     
      private ToggleButton InfosPerso;
     private Label label; 
             
-    public PageBienvenue (){
+    public VueGlobale (){
         
         this.InfosPerso= new ToggleButton ();
+        this.add(this.InfosPerso, 100, 1);
         
-        this.label=new Label("Bienvenue sur notre site de ventes aux enchères");
+       /* this.label=new Label("Bienvenue sur notre site de ventes aux enchères");
         this.setCenter(label);
         
          VBox vbox= new VBox (this.InfosPerso); 
-        this.setRight(vbox);
+        this.setRight(vbox);*/
         
-       PasswordField passwordField = new PasswordField();
+       /*PasswordField passwordField = new PasswordField();
        Button button = new Button("Show Password");
-       Label label = new Label("?");
+       Label label = new Label("?");*/
         
         
         
@@ -44,8 +46,5 @@ public class PageBienvenue extends BorderPane{
     
 }
 
-    PageBienvenue(MainPane aThis) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
     
 }

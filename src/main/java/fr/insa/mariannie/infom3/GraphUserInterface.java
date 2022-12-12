@@ -24,6 +24,7 @@ public class GraphUserInterface extends Application {
         Scene scene = new Scene(mp,1000,800);
         primaryStage.setScene(scene);
         primaryStage.show();
+        primaryStage.setTitle("Ventes aux enchères");
         
     }
      
