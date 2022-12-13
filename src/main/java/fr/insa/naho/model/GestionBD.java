@@ -7,6 +7,7 @@ package fr.insa.naho.model;
 import fr.insa.naho.model.GestionBD.MontantTropPetitException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import static java.sql.DriverManager.println;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
@@ -35,7 +36,7 @@ public class GestionBD {
 
     public static Connection defautConnect()
             throws ClassNotFoundException, SQLException {
-        return connectGeneralPostGres("localhost", 5439, "postgres", "postgres", "pass");
+        return connectGeneralPostGres("localhost", 5432, "postgres", "postgres", "pass");
     }
 
     public static void creeSchema(Connection con)
@@ -52,7 +53,7 @@ public class GestionBD {
                     + " nom varchar (30),"
                     + "prenom varchar(40),"
                     + "email varchar(100) unique,"
-                    + "mdp varchar (30),"
+                    + "motdepasse varchar (30),"
                     + "codepostal varchar (100)"
                     + ")";
 
@@ -320,7 +321,7 @@ public class GestionBD {
             // que je veux qu'il conserve les clés générées
             try ( PreparedStatement pst = con.prepareStatement(
                     """
-                insert into utilisateur (nom,prenom,email,mdp,codepostal) values (?,?,?,?,?)
+                insert into utilisateur (nom,prenom,email,motdepasse,codepostal) values (?,?,?,?,?)
                 """, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 pst.setString(1, nom);
                 pst.setString(2, prenom);
@@ -356,12 +357,12 @@ public class GestionBD {
     public static class CategorieExisteDejaException extends Exception {
     }
 
-    public static void demandeUtilisateur(Connection con, String nom, String prenom, String email, String mdp, String codepostal) throws SQLException {
+    public static void demandeUtilisateur(Connection con, String nom, String prenom, String email, String motdepasse, String codepostal) throws SQLException {
         boolean existe = true;
         while (existe) {
 
             try {
-                createUtilisateur(con, nom, prenom, email, mdp, codepostal);
+                createUtilisateur(con, nom, prenom, email, motdepasse, codepostal);
                 existe = false;
             } catch (EmailExisteDejaException ex) {
                 System.out.println("Cet email est déjà prit, choisissez en un autre.");
@@ -391,16 +392,14 @@ public class GestionBD {
                     System.out.println("Prenom: " + " " + testNom.getString("prenom"));
                     System.out.println("Email: " + " " + testNom.getString("email"));
                     System.out.println("Code Postal: " + " " + testNom.getString("codepostal"));
-                    System.out.println("Mot de passe: " + " " + testNom.getString("mdp"));
+                    System.out.println("Mot de passe: " + " " + testNom.getString("motdepasse"));
+
+                } else {
+                    throw new UtilisateurNexistePasException();
 
                 }
-                
-                else { 
-                    throw new UtilisateurNexistePasException();
-                    
-                }
             }
-        } 
+        }
     }
 
     public static void afficheUsers(Connection con) throws SQLException {
@@ -420,7 +419,7 @@ public class GestionBD {
                 System.out.println("Prenom: " + " " + result.getString("prenom"));
                 System.out.println("Email: " + " " + result.getString("email"));
                 System.out.println("Code Postal: " + " " + result.getString("codepostal"));
-                System.out.println("Mot de passe: " + " " + result.getString("mdp"));
+                System.out.println("Mot de passe: " + " " + result.getString("motdepasse"));
 
             }
         } catch (SQLException ex) {
@@ -504,12 +503,11 @@ public class GestionBD {
                 }
             }
         } catch (Exception ex) {
+            System.out.println("Problème" + ex.getMessage());
             con.rollback();
             throw ex;
-        } finally {
-            con.setAutoCommit(true);
-        }
 
+        }
     }
 
     public static class CategorieNexistePasException extends Exception {
@@ -549,17 +547,20 @@ public class GestionBD {
             }
 
         } catch (Exception ex) {
+            System.out.println("Problème" + ex.getMessage());
             con.rollback();
             throw ex;
+
         } finally {
             con.setAutoCommit(true);
+
         }
     }
 
     public static class ObjetNexistePasException extends Exception {
     }
 
-    public static int createEnchere(Connection con, Timestamp quand, int sur, int de, int montant) throws SQLException, ObjetNexistePasException, UtilisateurNexistePasException {
+    public static int createEnchere(Connection con, Timestamp quand, int montant, int sur, int de) throws SQLException, ObjetNexistePasException, UtilisateurNexistePasException {
 
         con.setAutoCommit(false);
 
@@ -585,6 +586,7 @@ public class GestionBD {
             }
 
         } catch (Exception ex) {
+            System.out.println("Problème" + ex.getMessage());
             con.rollback();
             throw ex;
         } finally {
@@ -601,7 +603,7 @@ public class GestionBD {
     }
 
     public static void demandeEnchere(Connection con, String titreobj, int offre, String emailuser)
-            throws SQLException, UtilisateurNexistePasException, ObjetNexistePasException, MontantTropPetitException, DelaiDEnchereDepasseException {
+            throws Exception {
 
         int sur = -1;
         int de = -1;
@@ -720,11 +722,14 @@ public class GestionBD {
 
                     }
                 }
-                createEnchere(con, quand, sur, de, offre); //maintenant on ajoute l'enchere si toute les conditions sont respectées
-
+                try {
+                    createEnchere(con, quand, offre, sur, de); //maintenant on ajoute l'enchere si toute les conditions sont respectées
+                } catch (Exception ex) {
+                    System.out.println("Problème" + ex.getMessage());
+                }
     }
 
-    public static void demandeObjet(Connection con, String titre, String description, int prixbase, int annee, int mois, int date, String Fin, String nomcatgen, String nomcat, String emailuser) throws SQLException, UtilisateurNexistePasException, CategorieNexistePasException {
+    public static void demandeObjet(Connection con, String titre, String description, int prixbase, int annee, int mois, int date, String Fin, String nomcatgen, String nomcat, String emailuser) throws Exception {
 
         boolean existe = true;
         while (existe) {
@@ -792,7 +797,8 @@ public class GestionBD {
                 createObjet(con, titre, description, debut, fin, prixbase, proposepar, categoriegenerale, categorie);
 
                 existe = false;
-            } catch (SQLException ex) {
+            } catch (Exception ex) {
+                System.out.println("Problème" + ex.getMessage());
 
             }
 
@@ -855,7 +861,17 @@ public class GestionBD {
                          order by titre asc
         
         """
-        )) {
+        );
+                
+                PreparedStatement searchobjet1 = con.prepareStatement(
+                """
+         select montant from enchere, objet where montant = 
+                                     (select max(montant) from enchere where sur = (select id from objet where categoriegenerale = (select id from categoriegenerale where nom=? ))) 
+        
+        """)   
+                
+                
+                ) {
 
             searchobjet.setString(1, nom); //on indique ici que le premier point ? référence le nom
             ResultSet rs = searchobjet.executeQuery();
@@ -870,8 +886,19 @@ public class GestionBD {
                 System.out.println("le prix de base est de: " + " " + rs.getInt("prixbase") + "euros");
 
             }
+            
+            searchobjet1.setString(1, nom); //on indique ici que le premier point ? référence le nom
+            ResultSet rs1 = searchobjet1.executeQuery();
+            
+              if (rs1.next()) {
+                System.out.println("l'enchère maximum faite est de: " + " " + rs1.getInt("montant") + "euros");
+            } else{
+                
+                System.out.println("Pas encore d'enchères faites sur cet objet");
+            }
 
         } catch (SQLException ex) {
+              System.out.println("problème: " + ex.getMessage());
             throw new Error(ex);
         }
     }
@@ -886,10 +913,19 @@ public class GestionBD {
                          order by titre asc
         
         """
-        )) {
+        );
+                
+                
+                PreparedStatement searchobjet1 = con.prepareStatement(
+                """
+         select montant from enchere, objet where montant = 
+                                     (select max(montant) from enchere where sur = (select id from objet where categorie = (select id from categorie where nom=? ))) 
+        
+        """)) {
 
             searchobjet.setString(1, nom); //on indique ici que le premier point ? référence le nom
             ResultSet rs = searchobjet.executeQuery();
+            
 
             while (rs.next()) {
 
@@ -898,11 +934,22 @@ public class GestionBD {
                 System.out.println("description: " + " " + rs.getString("description"));
                 System.out.println("date de mise en enchere: " + " " + rs.getTimestamp("debut"));
                 System.out.println("date de fin de la mise en enchere: " + " " + rs.getTimestamp("fin"));
-                System.out.println("le prix de base est de: " + " " + rs.getInt("prixbase") + "euros");
-
+                System.out.println("le prix de base était de: " + " " + rs.getInt("prixbase") + "euros");
+                
             }
-
+            
+            searchobjet1.setString(1, nom);
+            ResultSet rs1 = searchobjet1.executeQuery();
+            
+            if (rs1.next()) {
+                System.out.println("l'enchère maximum faite est de: " + " " + rs1.getInt("montant") + "euros");
+            } else{
+                
+                System.out.println("Pas encore d'enchères faites sur cet objet");
+            }
+            
         } catch (SQLException ex) {
+            System.out.println("problème: " + ex.getMessage());
             throw new Error(ex);
         }
     }
@@ -915,7 +962,16 @@ public class GestionBD {
                          order by titre asc
         
         """
-        )) {
+        );
+                 PreparedStatement searchobjett1 = con.prepareStatement(
+                """
+         select montant from enchere, objet where montant = 
+                                     (select max(montant) from enchere where sur = (select id from objet where description like ?)) 
+        
+        """)
+               
+                
+                ) {
 
             searchobjett.setString(1, "%" + mot + "%");
             ResultSet rs = searchobjett.executeQuery();
@@ -930,21 +986,40 @@ public class GestionBD {
                 System.out.println("le prix de base est de: " + " " + rs.getInt("prixbase") + " " + "euros");
 
             }
+            
+              searchobjett1.setString(1, "%" + mot + "%");
+            ResultSet rs1 = searchobjett1.executeQuery();
+            
+             if (rs1.next()) {
+                System.out.println("l'enchère maximum faite est de: " + " " + rs1.getInt("montant") + "euros");
+            } else{
+                
+                System.out.println("Pas encore d'enchères faites sur cet objet");
+            }
 
         } catch (SQLException ex) {
-            throw new Error(ex);
+            System.out.println("problème: " + ex.getMessage());
         }
     }
-    
-      public static void trouveObjetCodePostal(Connection con, String codepostal) throws SQLException {
+
+    public static void trouveObjetCodePostal(Connection con, String codepostal) throws SQLException {
         con.setAutoCommit(false);
         try ( PreparedStatement searchobjett = con.prepareStatement(
                 """
-         select * from objet where codepostal like ?
+         select objet.id, titre, description, debut, fin, prixbase from objet join utilisateur on objet.proposepar = utilisateur.id
+                where codepostal like ?
                          order by titre asc
         
         """
-        )) {
+        );
+             PreparedStatement searchobjett1 = con.prepareStatement(
+                """
+         select montant from enchere, objet where montant = 
+                                     (select max(montant) from enchere where sur = (select id from objet where proposepar = (select id from utilisateur where codepostal like ?))) 
+        
+        """)    
+                
+                ) {
 
             searchobjett.setString(1, "%" + codepostal + "%");
             ResultSet rs = searchobjett.executeQuery();
@@ -959,9 +1034,19 @@ public class GestionBD {
                 System.out.println("le prix de base est de: " + " " + rs.getInt("prixbase") + " " + "euros");
 
             }
+            
+              searchobjett1.setString(1, "%" + codepostal + "%");
+            ResultSet rs1 = searchobjett1.executeQuery();
+            
+             if (rs1.next()) {
+                System.out.println("l'enchère maximum faite est de: " + " " + rs1.getInt("montant") + "euros");
+            } else{
+                
+                System.out.println("Pas encore d'enchères faites sur cet objet");
+            }
 
         } catch (SQLException ex) {
-            throw new Error(ex);
+            System.out.println("problème: " + ex.getMessage());
         }
     }
 
@@ -1014,7 +1099,7 @@ public class GestionBD {
                 """
                
                 select objet.id, prenom, titre, quand, fin, montant from utilisateur, objet, enchere 
-                where utilisateur.id=enchere.de and enchere.sur = objet.id
+                where enchere.de = utilisateur.id and enchere.sur = objet.id
                 and email=?
                 order by quand asc
                                                                   
@@ -1077,7 +1162,7 @@ public class GestionBD {
                 con.commit();
 
             }
-        
+
         } finally {
             con.setAutoCommit(true);
         }
@@ -1153,14 +1238,14 @@ public class GestionBD {
             }
 
         } catch (SQLException ex) {
-            throw new Error(ex);
+            System.out.println("Problème" + ex.getMessage());
         }
     }
 
     public static void login(Connection con, String mail, String mdp) throws SQLException { //choisir un utilisateur à partir de son nom et renvoyer ses infos
 
         con.setAutoCommit(false);
-        try ( PreparedStatement searchuser = con.prepareStatement("select * from utilisateur where email=? and mdp = ?")) {
+        try ( PreparedStatement searchuser = con.prepareStatement("select * from utilisateur where email=? and motdepasse = ?")) {
 
             searchuser.setString(1, mail);
             searchuser.setString(2, mdp);//on indique ici que le premier point ? référence le nom
@@ -1181,9 +1266,7 @@ public class GestionBD {
 
         } catch (Exception ex) {
             con.rollback();
-            throw ex;
-        } finally {
-            con.setAutoCommit(true);
+            System.out.println("Problème" + ex.getMessage());
         }
 
     }
@@ -1212,10 +1295,12 @@ public class GestionBD {
 
             }
 
+        } catch (SQLException ex) {
+            System.out.println("Problème" + ex.getMessage());
         }
     }
 
-    public static void afficheallcats2(Connection con) throws Exception {
+    public static void afficheallcats2(Connection con) throws SQLException {
 
         con.setAutoCommit(false);
         try ( PreparedStatement searchcat = con.prepareStatement(
@@ -1238,22 +1323,33 @@ public class GestionBD {
             }
 
         } catch (SQLException ex) {
-            throw new Error(ex);
+
+            System.out.println("Problème" + ex.getMessage());
         }
+
     }
 
     public static void recreatebdd(Connection con) throws Exception {
-        int u1 = createUtilisateur(con, "Espinola", "Sophia",
-                "sophia.espinola@insa-strasbourg.fr", "andorre", "67000");
-        int cg1 = createCategorieGenerale(con, "Culture");
-        int c1 = createCategorie(con, "Livres", cg1);
-        int o1 = createObjet(con, "La fille de papier", "L'un des meilleurs romans de Guillaume Musso",
-                new Timestamp(System.currentTimeMillis()),
-                new Timestamp(System.currentTimeMillis() + 60 * 60 * 1000),
-                9, u1, cg1, c1);
+
+        try {
+            int u1 = createUtilisateur(con, "Espinola", "Sophia",
+                    "sophia.espinola@insa-strasbourg.fr", "andorre", "67000");
+            int u2 = createUtilisateur(con, "Amon", "Priscilla",
+                    "prichou02@gmail.com", "lunaticboii", "37000");
+            int cg1 = createCategorieGenerale(con, "Culture");
+            int c1 = createCategorie(con, "Livres", cg1);
+            int o1 = createObjet(con, "La fille de papier", "L'un des meilleurs romans de Guillaume Musso",
+                    new Timestamp(System.currentTimeMillis()),
+                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 1000),
+                    9, u1, cg1, c1);
+            int e1 = createEnchere(con, new Timestamp(System.currentTimeMillis()), 10, o1, u2);
+
+        } catch (Exception ex) {
+
+            System.out.println("Problème" + ex.getMessage());
+        }
 
     }
-
 }
 
 //    public static void main(String[] args) {

@@ -9,7 +9,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>16</maven.compiler.source>
         <maven.compiler.target>16</maven.compiler.target>
-        <exec.mainClass>com.mycompany.projetinfo.MainApp</exec.mainClass>
+        <exec.mainClass>fr.insa.naho.model.MainApp</exec.mainClass>
     </properties>
 
 

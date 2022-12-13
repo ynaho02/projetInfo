@@ -19,6 +19,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import static fr.insa.naho.model.GestionBD.trouveObjetCat;
 import static fr.insa.naho.model.GestionBD.trouveObjetCatGen;
+import static fr.insa.naho.model.GestionBD.trouveObjetCodePostal;
 import static fr.insa.naho.model.GestionBD.trouveidCategorie;
 import static fr.insa.naho.model.GestionBD.trouveUtilisateurMail;
 import java.awt.image.BufferedImage;
@@ -259,13 +260,16 @@ public class MainApp {
                         }
 
                         if (m == 5) {
-
-                            BufferedImage image;
-                            image = ImageIO.read(new File("toto.jpg"));
                             
-                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                            ImageIO.write(image, "png", baos);
-                            byte[] byteArr = baos.toByteArray();
+                            System.out.println("Entrez un code postal pour trouver des objets");
+                            String codepostal = Lire.S();
+                            trouveObjetCodePostal(con,codepostal);
+//                            BufferedImage image;
+//                            image = ImageIO.read(new File("toto.jpg"));
+//                            
+//                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//                            ImageIO.write(image, "png", baos);
+//                            byte[] byteArr = baos.toByteArray();
                         }
 
                         if (m == 6) {
