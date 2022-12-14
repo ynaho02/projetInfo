@@ -35,9 +35,9 @@ public class MainApp {
 
     public static void main(String[] args) {
 
-        try ( Connection con = defautConnect()) {
-            System.out.println("connection réussie");
-            MenuTexte(con);
+        try ( Connection con = defautConnect())  { //defautconnect renvoie une connection. Une fois que cette méthode est appelé ton sgbd est actif et tu peux accéder a la database depuis java
+            System.out.println("connection réussie"); //si la connection est établie ca te l'affiche, si tu n'as rien c'est que non
+            MenuTexte(con); //Toutes mes méthodes prennent au minimun une connection en entrée. Cette connection c'est celle qui t'aura été fournie après le défaut connect. Ca veut dire que toutes les méthodes dont tu te serviras auront forcément un impact sur la bdd 
         } catch (Exception ex) {
             throw new Error(ex);
         }
@@ -119,6 +119,8 @@ public class MainApp {
                         System.out.println("(4) Afficher la liste de tous les utilisateurs");
                         System.out.println("(5) Afficher l'ensemble des objets que vous avez mis en enchere");
                         System.out.println("(6) Afficher l'ensemble des encheres faites par un utilisateur donné");
+                        System.out.println("(7) Modifier votre adresse mail");
+                        System.out.println("(8) Modifier votre mot de passe");
                         System.out.println("(0) Quitter le menu");
                         System.out.println("Entrez votre choix");
                         m = Lire.i();
@@ -167,10 +169,31 @@ public class MainApp {
                             GestionBD.mesObjets(con, emailuser);
                         }
 
+                       
                         if (m == 6) {
                             System.out.println("entrez votre adresse mail");
                             String emailuser = Lire.S();
                             GestionBD.mesEncheres(con, emailuser);
+                        }
+                        
+                        if (m == 7) {
+                            System.out.println("entrez votre ancienne adresse mail");
+                            String oldemailuser = Lire.S();
+                            System.out.println("entrez votre nouvelle adresse mail");
+                            String newemailuser = Lire.S();
+                            
+                            GestionBD.demandeUpdateEmail(con, oldemailuser, newemailuser);
+                             System.out.println("Email modifié");
+                        }
+                        if (m == 8) {
+                            System.out.println("entrez votre ancien mot de passe");
+                            String oldmdp = Lire.S();
+                            System.out.println("entrez votre nouveau mot de passe");
+                            String newmdp = Lire.S();
+                            
+                            GestionBD.demandeUpdateMdp(con, oldmdp, newmdp);
+                            
+                            System.out.println("Mot de passe modifié");
                         }
 
                         if (m == 0) {
