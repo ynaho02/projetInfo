@@ -36,7 +36,8 @@ public class GestionBD {
 
     public static Connection defautConnect()
             throws ClassNotFoundException, SQLException {
-        return connectGeneralPostGres("localhost", 5432, "postgres", "postgres", "pass");
+        return connectGeneralPostGres("localhost", 5432, "postgres", "postgres", "pass"); //Le port c'est du 5432 sur ordi perso et du 5439 sur ordi de l'école
+        // donc si le port n'est pas changé modifie le!
     }
 
     public static void creeSchema(Connection con)
@@ -1242,7 +1243,7 @@ public class GestionBD {
         }
     }
 
-    public static void login(Connection con, String mail, String mdp) throws SQLException { //choisir un utilisateur à partir de son nom et renvoyer ses infos
+    public static void login(Connection con, String mail, String mdp) throws Exception { //choisir un utilisateur à partir de son nom et renvoyer ses infos
 
         con.setAutoCommit(false);
         try ( PreparedStatement searchuser = con.prepareStatement("select * from utilisateur where email=? and motdepasse = ?")) {
@@ -1261,6 +1262,9 @@ public class GestionBD {
 
                     System.out.println("Login successful");
 
+                } else {
+                    
+                    throw new UtilisateurNexistePasException();
                 }
             }
 
