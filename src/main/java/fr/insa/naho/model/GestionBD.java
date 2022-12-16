@@ -36,7 +36,7 @@ public class GestionBD {
 
     public static Connection defautConnect()
             throws ClassNotFoundException, SQLException {
-        return connectGeneralPostGres("localhost", 5432, "postgres", "postgres", "pass"); //Le port c'est du 5432 sur ordi perso et du 5439 sur ordi de l'école
+        return connectGeneralPostGres("localhost", 5439, "postgres", "postgres", "pass"); //Le port c'est du 5432 sur ordi perso et du 5439 sur ordi de l'école
         // donc si le port n'est pas changé modifie le!
     }
 
@@ -1051,7 +1051,7 @@ public class GestionBD {
         }
     }
 
-    public static void mesObjets(Connection con, String emailuser) throws SQLException { //il manque une vérification de si l'utilisateur existe vraiment ou pas
+    public static void mesObjets(Connection con, String emailuser) throws Exception { //il manque une vérification de si l'utilisateur existe vraiment ou pas
 
         con.setAutoCommit(false);
         try ( PreparedStatement searchuser = con.prepareStatement(
@@ -1065,10 +1065,11 @@ public class GestionBD {
                 """
         )) {
 
-            searchuser.setString(1, emailuser); //on indique ici que le premier point ? référence le nom
+            searchuser.setString(1, emailuser); 
             ResultSet testNom = searchuser.executeQuery();
 
             boolean exist = false;
+            
             while (testNom.next()) { //je vérifie que le nom est bien dans la base de données
                 //le resultset est un peu comme un tableau quicontient l'ensemble des résultats de ta requete
                 //quand tu fais next le pointeur va sur une autre case mais au début il est avant la première ligne
@@ -1086,9 +1087,15 @@ public class GestionBD {
                     System.out.println("Et un prix initial de : " + " " + testNom.getInt("prixbase"));
 
                 }
+                
+                else {
+                    
+                    System.out.println("Pas encore d'objet mis en enchère");
+                }
             }
-        } catch (SQLException ex) {
-            throw new Error(ex);
+        } catch (Exception ex) {
+            System.out.println(" "+ex.getMessage());
+            
         }
 
     }
@@ -1133,7 +1140,78 @@ public class GestionBD {
         }
 
     }
+    
+       public static void updateUtilisateurMdp(Connection con, String oldmdp, String newmdp)
+            throws SQLException, UtilisateurNexistePasException {
+       
+        con.setAutoCommit(false);
+        try ( PreparedStatement cherchemdp = con.prepareStatement(
+                "select id from utilisateur where motdepasse = ?")) { //seul le mail doit etre unique pour notre bdd
+            cherchemdp.setString(1, oldmdp); //on indique ici que le premier point ? référence le mail
+            ResultSet testmdp = cherchemdp.executeQuery();
+            if (testmdp.next()) {
+                System.out.println("Nous avons retrouvé l'utilisateur concerné.");
+            } else {
+                throw new UtilisateurNexistePasException();
 
+            }
+
+            try ( PreparedStatement pst = con.prepareStatement(
+                    """
+               UPDATE utilisateur
+               SET motdepasse = ?
+               WHERE motdepasse = ?
+                """)) {
+                pst.setString(1, newmdp);
+                pst.setString(2, oldmdp);
+
+                pst.executeUpdate();
+                con.commit();
+
+            }
+
+        } finally {
+            con.setAutoCommit(true);
+        }
+
+    }
+       
+    public static void updateUtilisateurEmail(Connection con, String oldemail, String newemail)
+            throws SQLException, UtilisateurNexistePasException {
+       
+        con.setAutoCommit(false);
+        try ( PreparedStatement cherchemail= con.prepareStatement(
+                "select id from utilisateur where email = ?")) { //seul le mail doit etre unique pour notre bdd
+            cherchemail.setString(1, oldemail); //on indique ici que le premier point ? référence le mail
+            ResultSet testmail = cherchemail.executeQuery();
+            if (testmail.next()) {
+                System.out.println("Nous avons retrouvé l'utilisateur concerné.");
+            } else {
+                throw new UtilisateurNexistePasException();
+
+            }
+
+            try ( PreparedStatement pst = con.prepareStatement(
+                    """
+               UPDATE utilisateur
+               SET email = ?
+               WHERE email = ?
+                """)) {
+                pst.setString(1, newemail);
+                pst.setString(2, oldemail);
+
+                pst.executeUpdate();
+                con.commit();
+
+            }
+
+        } finally {
+            con.setAutoCommit(true);
+        }
+
+    }
+    
+    
     public static void updateObjetFin(Connection con, String titre, Timestamp fin)
             throws SQLException, ObjetNexistePasException {
         // je me place dans une transaction pour m'assurer que la séquence
@@ -1180,7 +1258,39 @@ public class GestionBD {
                 updateObjetFin(con, Titre, fin);
                 existe = false;
             } catch (ObjetNexistePasException ex) {
-                System.out.println("cet objet n'existe pas désolé");
+                System.out.println(""+ex.getMessage());
+            }
+        }
+
+    }
+    
+    public static void demandeUpdateEmail(Connection con, String oldemail, String newemail) throws SQLException, UtilisateurNexistePasException {
+
+        boolean existe = true;
+        while (existe) {
+
+            
+            try {
+                updateUtilisateurEmail(con, oldemail, newemail);
+                existe = false;
+            } catch (UtilisateurNexistePasException ex) {
+                System.out.println(""+ex.getMessage());
+            }
+        }
+
+    }
+    
+    public static void demandeUpdateMdp(Connection con, String oldmdp, String newmdp) throws SQLException, UtilisateurNexistePasException {
+
+        boolean existe = true;
+        while (existe) {
+
+            
+            try {
+                updateUtilisateurEmail(con, oldmdp, newmdp);
+                existe = false;
+            } catch (UtilisateurNexistePasException ex) {
+                System.out.println(""+ex.getMessage());
             }
         }
 
