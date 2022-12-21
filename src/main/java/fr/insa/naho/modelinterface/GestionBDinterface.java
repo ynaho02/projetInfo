@@ -2,8 +2,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package modelinterface;
+package fr.insa.naho.modelinterface;
 
+import fr.insa.naho.modelinterface.Enchere;
+import fr.insa.naho.modelinterface.Categoriegenerale;
+import fr.insa.naho.modelinterface.Categorie;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;

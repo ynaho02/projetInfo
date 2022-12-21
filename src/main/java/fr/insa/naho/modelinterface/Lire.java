@@ -1,4 +1,4 @@
-package modelinterface;
+package fr.insa.naho.modelinterface;
 
 import fr.insa.naho.model.*;
 import java.io.*;
