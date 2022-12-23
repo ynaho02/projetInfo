@@ -4,25 +4,29 @@
  */
 package fr.insa.naho.modelinterface;
 
-import fr.insa.naho.modelinterface.GestionBDinterface;
-import static fr.insa.naho.model.GestionBD.trouveObjetMot;
-import static fr.insa.naho.model.GestionBD.afficheEnchere;
-import static fr.insa.naho.model.GestionBD.afficheUsers;
-import static fr.insa.naho.model.GestionBD.creeSchema;
-import static fr.insa.naho.model.GestionBD.defautConnect;
-import static fr.insa.naho.model.GestionBD.deleteSchema;
-import static fr.insa.naho.model.GestionBD.demandeCategorie;
-import static fr.insa.naho.model.GestionBD.demandeUpdateFin;
-import static fr.insa.naho.model.GestionBD.login;
-import static fr.insa.naho.model.GestionBD.recreatebdd;
 
+
+import fr.insa.naho.model.GestionBD;
+import static fr.insa.naho.modelinterface.GestionBDinterface.afficheAllObjets;
+import static fr.insa.naho.modelinterface.GestionBDinterface.afficheEnchere;
+import static fr.insa.naho.modelinterface.GestionBDinterface.afficheEncheresDeMesObjets;
+import static fr.insa.naho.modelinterface.GestionBDinterface.afficheUsers;
+import static fr.insa.naho.modelinterface.GestionBDinterface.creeSchema;
+import static fr.insa.naho.modelinterface.GestionBDinterface.defautConnect;
+import static fr.insa.naho.modelinterface.GestionBDinterface.deleteSchema;
+import static fr.insa.naho.modelinterface.GestionBDinterface.demandeCategorie;
+import static fr.insa.naho.modelinterface.GestionBDinterface.demandeUpdateFin;
+import static fr.insa.naho.modelinterface.GestionBDinterface.login;
+import static fr.insa.naho.modelinterface.GestionBDinterface.recreatebdd;
+import static fr.insa.naho.modelinterface.GestionBDinterface.trouveObjetCat;
+import static fr.insa.naho.modelinterface.GestionBDinterface.trouveObjetCatGen;
+import static fr.insa.naho.modelinterface.GestionBDinterface.trouveObjetCodePostal;
+import static fr.insa.naho.modelinterface.GestionBDinterface.trouveObjetMot;
+import static fr.insa.naho.modelinterface.GestionBDinterface.trouveUtilisateurMail;
+import static fr.insa.naho.modelinterface.GestionBDinterface.trouveidCategorie;
 import java.sql.Connection;
 import java.sql.SQLException;
-import static fr.insa.naho.model.GestionBD.trouveObjetCat;
-import static fr.insa.naho.model.GestionBD.trouveObjetCatGen;
-import static fr.insa.naho.model.GestionBD.trouveObjetCodePostal;
-import static fr.insa.naho.model.GestionBD.trouveidCategorie;
-import static fr.insa.naho.model.GestionBD.trouveUtilisateurMail;
+
 
 /**
  *
@@ -40,7 +44,7 @@ public class MainAppinterface {
         }
     }
 
-    public static void MenuTexte(Connection con) throws SQLException, GestionBDinterface.UtilisateurNexistePasException, GestionBDinterface.CategorieNexistePasException, GestionBDinterface.CategorieExisteDejaException, GestionBDinterface.ObjetNexistePasException, GestionBDinterface.MontantTropPetitException, GestionBDinterface.DelaiDEnchereDepasseException, Exception {
+    public static void MenuTexte(Connection con) throws SQLException, GestionBD.UtilisateurNexistePasException, GestionBD.CategorieNexistePasException, GestionBD.CategorieExisteDejaException, GestionBD.ObjetNexistePasException, GestionBD.MontantTropPetitException, GestionBD.DelaiDEnchereDepasseException, Exception {
 
         int m = -1;
 
@@ -115,9 +119,10 @@ public class MainAppinterface {
                         System.out.println("(3) Retrouver un utilisateur en entrant son mail");
                         System.out.println("(4) Afficher la liste de tous les utilisateurs");
                         System.out.println("(5) Afficher l'ensemble des objets que vous avez mis en enchere");
-                        System.out.println("(6) Afficher l'ensemble des encheres faites par un utilisateur donné");
-                        System.out.println("(7) Modifier votre adresse mail");
-                        System.out.println("(8) Modifier votre mot de passe");
+                        System.out.println("(6) Afficher l'ensemble des objets sur lesquels vous avez mis une enchère");
+                        System.out.println("(7) Voir toutes les enchères mises sur un de vos objets");
+                        System.out.println("(8) Modifier votre adresse mail");
+                        System.out.println("(9) Modifier votre mot de passe");
                         System.out.println("(0) Quitter le menu");
                         System.out.println("Entrez votre choix");
                         m = Lire.i();
@@ -170,10 +175,15 @@ public class MainAppinterface {
                         if (m == 6) {
                             System.out.println("entrez votre adresse mail");
                             String emailuser = Lire.S();
-                            GestionBDinterface.mesEncheres(con, emailuser);
+                            GestionBDinterface.mesObjetsVoulus(con, emailuser);
                         }
-                        
-                        if (m == 7) {
+                        if (m==7){
+                            
+                            System.out.println("Entrez votre adresse mail ");
+                            String emailuser = Lire.S();
+                            afficheEncheresDeMesObjets(con,emailuser);
+                        }
+                        if (m == 8) {
                             System.out.println("entrez votre ancienne adresse mail");
                             String oldemailuser = Lire.S();
                             System.out.println("entrez votre nouvelle adresse mail");
@@ -182,7 +192,7 @@ public class MainAppinterface {
                             GestionBDinterface.demandeUpdateEmail(con, oldemailuser, newemailuser);
                              System.out.println("Email modifié");
                         }
-                        if (m == 8) {
+                        if (m == 9) {
                             System.out.println("entrez votre ancien mot de passe");
                             String oldmdp = Lire.S();
                             System.out.println("entrez votre nouveau mot de passe");
@@ -213,6 +223,7 @@ public class MainAppinterface {
                         System.out.println("(4) Chercher un objet en entrant une brève description (un mot)");
                         System.out.println("(5) Chercher un objet en entrant un code postal");
                         System.out.println("(6) Modifier la date de fin d'enchere d'un objet");
+                        System.out.println("(7) Afficher l'ensemble des objets déposés sur le site");
                         System.out.println("(0) Quitter le menu");
                         System.out.println("Entrez votre choix");
                         m = Lire.i();
@@ -317,7 +328,9 @@ public class MainAppinterface {
                             demandeUpdateFin(con, Titre, annee, mois, jour, Fin);
                             System.out.println("La date a été modifiée avec succès.");
                         }
-
+                        if (m==7){
+                            afficheAllObjets(con);
+                        }
                         if (m == 0) {
                             System.out.println("ok bye");
 

@@ -18,4 +18,10 @@ public class Categoriegenerale {
         this.id = id;
         this.nom=nom;
     }
+    
+     @Override
+    public String toString(){
+       return "Catégorie générale numéro: "+" "+this.id +" "+ "nom:"+ " " +this.nom+" ";
+    
+}
 }

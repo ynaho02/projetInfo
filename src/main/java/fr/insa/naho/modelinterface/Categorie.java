@@ -20,5 +20,12 @@ public class Categorie {
         this.generale=generale;
         this.nom=nom;
     }
+     @Override
+    public String toString(){
+       return "Catégorie numéro: "+" "+this.id +" "+ "nom:"+ " " +this.nom+" "+
+               "identifiant de la caégorie générale:"+ " " +this.generale;
+    
+}
+    
     
 }

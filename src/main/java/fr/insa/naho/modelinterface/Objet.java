@@ -35,67 +35,53 @@ public class Objet {
        
     }
 
-    /**
-     * @return the id
-     */
     public int getId() {
         return id;
     }
 
-    /**
-     * @return the titre
-     */
     public String getTitre() {
         return titre;
     }
 
-    /**
-     * @return the description
-     */
     public String getDescription() {
         return description;
     }
 
-    /**
-     * @return the debut
-     */
     public Timestamp getDebut() {
         return debut;
     }
 
-    /**
-     * @return the fin
-     */
     public Timestamp getFin() {
         return fin;
     }
 
-    /**
-     * @return the prixbase
-     */
     public int getPrixbase() {
         return prixbase;
     }
 
-    /**
-     * @return the proposepar
-     */
+    
     public int getProposepar() {
         return proposepar;
     }
 
-    /**
-     * @return the categoriegenerale
-     */
+    
     public int getCategoriegenerale() {
         return categoriegenerale;
     }
 
-    /**
-     * @return the categorie
-     */
+    
     public int getCategorie() {
         return categorie;
     }
     
+    @Override
+    public String toString(){
+       return "Objet numéro: "+" "+this.id +" "+ "titre:"+ " " +this.titre+" "+
+               "description:"+ " " +this.description+ " "+ "debut d'enchere:"+" "+this.debut+" "+
+               "fin d'enchere"+ " "+this.fin +" "+ "prix de base:" + " "+ this.prixbase+" "+
+               "proposé par l'utilisateur d'identifiant:"+ " " +this.proposepar+ " "+
+               "appartenant à la catégorie générale numéro:"+ " "+this.categoriegenerale+ " "+
+               "et à la catégorie:"+ " "+this.categorie;
+    
+}
 }

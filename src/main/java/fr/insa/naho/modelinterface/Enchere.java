@@ -29,4 +29,12 @@ public class Enchere {
         this.de= de;
     }
     
+    @Override
+    public String toString(){
+       return "Enchère numéro: "+" "+this.id +" "+ "faite le:"+ " " +this.quand+" "+
+               "d'un montant de:"+ " " +this.montant+ " "+ "sur l'objet d'identifiant:"+" "+this.sur+" "+
+               "par l'utilisaeur d'identifiant"+ " "+this.de; 
+    
+}
+    
 }

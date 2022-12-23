@@ -4,22 +4,22 @@
  */
 package fr.insa.naho.modelinterface;
 
-import fr.insa.naho.model.*;
+
 
 /**
  *
  * @author nahoy
  */
 public class Utilisateur {
-    
+    private int id;
     private String nom;
     private String prenom;
     private String email;
     private String motdepasse;
     private String codepostal;
     
-    public Utilisateur(String nom, String prenom, String email, String motdepasse, String codepostal ) {
-        
+    public Utilisateur(int id, String nom, String prenom, String email, String motdepasse, String codepostal ) {
+        this.id=id;
         this.nom=nom;
         this.prenom=prenom;
         this.email= email;
@@ -27,4 +27,11 @@ public class Utilisateur {
         this.codepostal=codepostal;
     }
     
+     @Override
+    public String toString(){
+       return "Utilisateur d'identifiant: "+" "+this.id +" "+ "nom:"+ " " +this.nom+" "+
+               "prénom:"+ " " +this.prenom+ " "+ "email:"+" "+this.email+" "+
+               "mot de passe"+ " "+this.motdepasse+" "+"code postal:"+ " "+ this.codepostal; 
+    
+}
 }
