@@ -31,8 +31,8 @@ public class Enchere {
     
     @Override
     public String toString(){
-       return "Enchère numéro: "+" "+this.id +" "+ "faite le:"+ " " +this.quand+" "+
-               "d'un montant de:"+ " " +this.montant+ " "+ "sur l'objet d'identifiant:"+" "+this.sur+" "+
+       return "Enchère numéro: "+" "+this.id +"\n"+ "faite le:"+ " " +this.quand+"\n"+
+               "d'un montant de:"+ " " +this.montant+ "\n"+ "sur l'objet d'identifiant:"+" "+this.sur+"\n"+
                "par l'utilisaeur d'identifiant"+ " "+this.de; 
     
 }

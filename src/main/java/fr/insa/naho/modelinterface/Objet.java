@@ -76,11 +76,11 @@ public class Objet {
     
     @Override
     public String toString(){
-       return "Objet numéro: "+" "+this.id +" "+ "titre:"+ " " +this.titre+" "+
-               "description:"+ " " +this.description+ " "+ "debut d'enchere:"+" "+this.debut+" "+
-               "fin d'enchere"+ " "+this.fin +" "+ "prix de base:" + " "+ this.prixbase+" "+
-               "proposé par l'utilisateur d'identifiant:"+ " " +this.proposepar+ " "+
-               "appartenant à la catégorie générale numéro:"+ " "+this.categoriegenerale+ " "+
+       return "Objet numéro: "+" "+this.id +"\n"+ "titre:"+ " " +this.titre+"\n"+
+               "description:"+ " " +this.description+ "\n"+ "debut d'enchere:"+" "+this.debut+"\n"+
+               "fin d'enchere"+ " "+this.fin +"\n"+ "prix de base:" + " "+ this.prixbase+"\n"+
+               "proposé par l'utilisateur d'identifiant:"+ " " +this.proposepar+ "\n"+
+               "appartenant à la catégorie générale numéro:"+ " "+this.categoriegenerale+ "\n"+
                "et à la catégorie:"+ " "+this.categorie;
     
 }

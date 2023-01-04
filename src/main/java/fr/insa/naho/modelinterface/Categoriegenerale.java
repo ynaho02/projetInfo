@@ -21,7 +21,7 @@ public class Categoriegenerale {
     
      @Override
     public String toString(){
-       return "Catégorie générale numéro: "+" "+this.id +" "+ "nom:"+ " " +this.nom+" ";
+       return "Catégorie générale numéro: "+" "+this.id +"\n"+ "nom:"+ " " +this.nom+" ";
     
 }
 }

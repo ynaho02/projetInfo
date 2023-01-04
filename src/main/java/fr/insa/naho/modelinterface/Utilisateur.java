@@ -29,9 +29,9 @@ public class Utilisateur {
     
      @Override
     public String toString(){
-       return "Utilisateur d'identifiant: "+" "+this.id +" "+ "nom:"+ " " +this.nom+" "+
-               "prénom:"+ " " +this.prenom+ " "+ "email:"+" "+this.email+" "+
-               "mot de passe"+ " "+this.motdepasse+" "+"code postal:"+ " "+ this.codepostal; 
+       return "Utilisateur d'identifiant: "+" "+this.id +"\n"+ "nom:"+ " " +this.nom+"\n"+
+               "prénom:"+ " " +this.prenom+ "\n"+ "email:"+" "+this.email+"\n"+
+               "mot de passe"+ " "+this.motdepasse+"\n"+"code postal:"+ " "+ this.codepostal; 
     
 }
 }

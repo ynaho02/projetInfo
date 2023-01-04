@@ -1032,10 +1032,9 @@ public class GestionBDinterface {
                 Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("description"), rs.getTimestamp("debut"),
                         rs.getTimestamp("fin"), rs.getInt("prixbase"), rs.getInt("proposepar"), rs.getInt("categoriegenerale"),
                         rs.getInt("categorie"));
-
-                objets.add(objet);
                 int maxi = getMax(con, objet);
                 System.out.println("Le montant de l'enchère maximale est de :"+" "+maxi+ " "+ "euros");
+                objets.add(objet);
             }
 
         } catch (SQLException ex) {
