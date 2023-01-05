@@ -16,6 +16,7 @@ import static fr.insa.naho.model.GestionBD.demandeCategorie;
 import static fr.insa.naho.model.GestionBD.demandeUpdateFin;
 import static fr.insa.naho.model.GestionBD.login;
 import static fr.insa.naho.model.GestionBD.recreatebdd;
+import static fr.insa.naho.model.GestionBD.recreationbdd;
 import static fr.insa.naho.model.GestionBD.trouveObjetCat;
 
 import java.sql.Connection;
@@ -79,28 +80,15 @@ public class MainApp {
                     while (m != 0) {
                         System.out.println("Bienvenue dans le menu ensemble de tables!");
                         System.out.println("Voici vos options");
-                        System.out.println("(1) Creer un schema");
-                        System.out.println("(2) Supprimer un schema existant");
-                        System.out.println("(3) Ajouter automatiquement des éléments dans ta bdd");
-
-                        System.out.println("(0) Quitter le menu");
+                        System.out.println("(1) Supprime et récréer votre bdd");
                         System.out.println("Entrez votre choix");
                         m = Lire.i();
 
                         if (m == 1) {
-                            creeSchema(con);
+                            recreationbdd(con);
 
                         }
 
-                        if (m == 2) {
-                            deleteSchema(con);
-
-                        }
-
-                        if (m == 3) {
-                            recreatebdd(con);
-
-                        }
                         if (m == 0) {
                             System.out.println("eh bien aurevoir");
 

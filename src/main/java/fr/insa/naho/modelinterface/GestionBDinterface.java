@@ -1536,23 +1536,73 @@ public class GestionBDinterface {
     public static void recreatebdd(Connection con) throws Exception {
 
         try {
-            int u1 = createUtilisateur(con, "Espinola", "Sophia",
-                    "sophia.espinola@insa-strasbourg.fr", "andorre", "67000");
-            int u2 = createUtilisateur(con, "Amon", "Priscilla",
-                    "prichou02@gmail.com", "lunaticboii", "37000");
-            int cg1 = createCategorieGenerale(con, "Culture");
-            int c1 = createCategorie(con, "Livres", cg1);
-            int o1 = createObjet(con, "La fille de papier", "L'un des meilleurs romans de Guillaume Musso",
+            int u1 = createUtilisateur(con, "Naho", "Yezou",
+                    "naho@gmail.com", "bestmdpever", "67000");
+            int u2 = createUtilisateur(con, "Mariannie", "Alexandra",
+                    "alex@gmail.com", "admin", "67000");
+            int u3 = createUtilisateur(con, "Amon", "Priscilla",
+                    "prichou@gmail.com", "luna", "37000");
+            int u4 = createUtilisateur(con, "De Beuvron", "François",
+                    "beuvron@gmail.com", "prof", "67000");
+            int cg1 = createCategorieGenerale(con, "Meubles");
+            int cg2 = createCategorieGenerale(con, "Accessoires");
+            int cg3= createCategorieGenerale(con, "Vehicules");
+            int c1 = createCategorie(con, "Lits", cg1);
+            int c2 = createCategorie(con, "Chaises", cg1);
+            int c3=createCategorie(con, "Bijoux", cg2);
+            int c4= createCategorie(con, "Sacs", cg2);
+            int c5=createCategorie(con, "Voitures", cg3);
+            int c6= createCategorie(con, "Vélos", cg3);
+            
+            int o1 = createObjet(con, "Lit en hauteur", "lit pratique, rouge, bien pour les enfants",
                     new Timestamp(System.currentTimeMillis()),
-                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 1000),
-                    9, u1, cg1, c1);
-            int e1 = createEnchere(con, new Timestamp(System.currentTimeMillis()), 10, o1, u2);
+                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 48000*1000),
+                    20, u1, cg1, c1);
+            int o2 = createObjet(con, "Chaise en cuir", "chaise confortable, noire, siège chauffant",
+                    new Timestamp(System.currentTimeMillis()),
+                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 48000*1000),
+                    150, u2, cg1, c2);
+            int o3 = createObjet(con, "Pendentif soleil", "or plaqué, très joli",
+                    new Timestamp(System.currentTimeMillis()),
+                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 24000*1000),
+                    35, u3, cg2, c3);
+            int o4 = createObjet(con, "sac à dos", "marque quechua, gris, contient beaucoup d'espace",
+                    new Timestamp(System.currentTimeMillis()),
+                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 48000*1000),
+                    20, u4, cg2, c4);
+            int o5 = createObjet(con, "Peugeot 306", "vieille voiture, jaune orangé, encore en excellent état, petit bolide",
+                    new Timestamp(System.currentTimeMillis()),
+                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 72000*1000),
+                    1500, u1, cg3, c5);
+            int o6 = createObjet(con, "bicyclette", "rose avec un panier à l'avant"+"/n"+"Elle appartenait à Marilyn Monroe ",
+                    new Timestamp(System.currentTimeMillis()),
+                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 72000*1000),
+                    20, u1, cg1, c1);
+            createEnchere(con, new Timestamp(System.currentTimeMillis()), 30, o1, u2);
+            createEnchere(con, new Timestamp(System.currentTimeMillis()), 160, o2, u3);
+            createEnchere(con, new Timestamp(System.currentTimeMillis()), 40, o3, u4);
+            createEnchere(con, new Timestamp(System.currentTimeMillis()), 21, o4, u1);
+            createEnchere(con, new Timestamp(System.currentTimeMillis()), 1600, o5, u2);
+            createEnchere(con, new Timestamp(System.currentTimeMillis()), 25, o6, u3);
+            
+            System.out.println("Utilisateurs, Catégories, Objets et Enchères ajoutés avec succès");
 
         } catch (Exception ex) {
 
             System.out.println("Problème" + ex.getMessage());
         }
 
+    }
+    
+    public static void recreationbdd(Connection con) throws SQLException, Exception{
+        //efface et recrée la bdd mais ne permet pas d'ajouter d'enchère, il faudra le faire manuellement
+        try{
+            deleteSchema(con);
+            creeSchema(con);
+            recreatebdd(con);
+        } catch (Exception ex){
+          System.out.println("Problème" + ex.getMessage());  
+        }
     }
 }
 

@@ -18,6 +18,7 @@ import static fr.insa.naho.modelinterface.GestionBDinterface.demandeCategorie;
 import static fr.insa.naho.modelinterface.GestionBDinterface.demandeUpdateFin;
 import static fr.insa.naho.modelinterface.GestionBDinterface.login;
 import static fr.insa.naho.modelinterface.GestionBDinterface.recreatebdd;
+import static fr.insa.naho.modelinterface.GestionBDinterface.recreationbdd;
 import static fr.insa.naho.modelinterface.GestionBDinterface.trouveObjetCat;
 import static fr.insa.naho.modelinterface.GestionBDinterface.trouveObjetCatGen;
 import static fr.insa.naho.modelinterface.GestionBDinterface.trouveObjetCodePostal;
@@ -26,6 +27,7 @@ import static fr.insa.naho.modelinterface.GestionBDinterface.trouveUtilisateurMa
 import static fr.insa.naho.modelinterface.GestionBDinterface.trouveidCategorie;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
 
 /**
@@ -38,7 +40,7 @@ public class MainAppinterface {
 
         try ( Connection con = defautConnect())  { //defautconnect renvoie une connection. Une fois que cette méthode est appelé ton sgbd est actif et tu peux accéder a la database depuis java
             System.out.println("connection réussie"); //si la connection est établie ca te l'affiche, si tu n'as rien c'est que non
-            MenuTexte(con); //Toutes mes méthodes prennent au minimun une connection en entrée. Cette connection c'est celle qui t'aura été fournie après le défaut connect. Ca veut dire que toutes les méthodes dont tu te serviras auront forcément un impact sur la bdd 
+         MenuTexte(con); //Toutes mes méthodes prennent au minimun une connection en entrée. Cette connection c'est celle qui t'aura été fournie après le défaut connect. Ca veut dire que toutes les méthodes dont tu te serviras auront forcément un impact sur la bdd 
         } catch (Exception ex) {
             throw new Error(ex);
         }
@@ -77,28 +79,16 @@ public class MainAppinterface {
                     while (m != 0) {
                         System.out.println("Bienvenue dans le menu ensemble de tables!");
                         System.out.println("Voici vos options");
-                        System.out.println("(1) Creer un schema");
-                        System.out.println("(2) Supprimer un schema existant");
-                        System.out.println("(3) Ajouter automatiquement des éléments dans ta bdd");
-
+                        System.out.println("(1) Effacer puis recréer votre bdd ");
                         System.out.println("(0) Quitter le menu");
                         System.out.println("Entrez votre choix");
                         m = Lire.i();
 
                         if (m == 1) {
-                            creeSchema(con);
+                            recreationbdd(con);
 
                         }
 
-                        if (m == 2) {
-                            deleteSchema(con);
-
-                        }
-
-                        if (m == 3) {
-                            recreatebdd(con);
-
-                        }
                         if (m == 0) {
                             System.out.println("eh bien aurevoir");
 
