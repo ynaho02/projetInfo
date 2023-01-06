@@ -23,6 +23,7 @@ import static fr.insa.naho.modelinterface.GestionBDinterface.trouveObjetCat;
 import static fr.insa.naho.modelinterface.GestionBDinterface.trouveObjetCatGen;
 import static fr.insa.naho.modelinterface.GestionBDinterface.trouveObjetCodePostal;
 import static fr.insa.naho.modelinterface.GestionBDinterface.trouveObjetMot;
+import static fr.insa.naho.modelinterface.GestionBDinterface.trouveObjetTitre;
 import static fr.insa.naho.modelinterface.GestionBDinterface.trouveUtilisateurMail;
 import static fr.insa.naho.modelinterface.GestionBDinterface.trouveidCategorie;
 import java.sql.Connection;
@@ -211,9 +212,10 @@ public class MainAppinterface {
                         System.out.println("(2) Chercher un objet en entrant une catégorie générale");
                         System.out.println("(3) Chercher un objet en entrant une sous-catégorie");
                         System.out.println("(4) Chercher un objet en entrant une brève description (un mot)");
-                        System.out.println("(5) Chercher un objet en entrant un code postal");
-                        System.out.println("(6) Modifier la date de fin d'enchere d'un objet");
-                        System.out.println("(7) Afficher l'ensemble des objets déposés sur le site");
+                        System.out.println("(5) Chercher un objet en entrant un titre");
+                        System.out.println("(6) Chercher un objet en entrant un code postal");
+                        System.out.println("(7) Modifier la date de fin d'enchere d'un objet");
+                        System.out.println("(8 Afficher l'ensemble des objets déposés sur le site");
                         System.out.println("(0) Quitter le menu");
                         System.out.println("Entrez votre choix");
                         m = Lire.i();
@@ -279,8 +281,14 @@ public class MainAppinterface {
                             String mot = Lire.S();
                             trouveObjetMot(con, mot);
                         }
-
+                        
                         if (m == 5) {
+                            System.out.println("Entrez un mot clé pour chercher des objets correspondants");
+                            String mot = Lire.S();
+                            trouveObjetTitre(con, mot);
+                        }
+
+                        if (m == 6) {
                             
                             System.out.println("Entrez un code postal pour trouver des objets");
                             String codepostal = Lire.S();
@@ -293,7 +301,7 @@ public class MainAppinterface {
 //                            byte[] byteArr = baos.toByteArray();
                         }
 
-                        if (m == 6) {
+                        if (m == 7) {
 
                             System.out.println("--- modification date de fin de mise en enchere");
 
@@ -318,7 +326,7 @@ public class MainAppinterface {
                             demandeUpdateFin(con, Titre, annee, mois, jour, Fin);
                             System.out.println("La date a été modifiée avec succès.");
                         }
-                        if (m==7){
+                        if (m==8){
                             afficheAllObjets(con);
                         }
                         if (m == 0) {

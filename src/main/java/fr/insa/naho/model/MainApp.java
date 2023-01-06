@@ -26,6 +26,7 @@ import static fr.insa.naho.model.GestionBD.trouveObjetCodePostal;
 import static fr.insa.naho.model.GestionBD.trouveObjetMot;
 import static fr.insa.naho.model.GestionBD.trouveUtilisateurMail;
 import static fr.insa.naho.model.GestionBD.trouveidCategorie;
+import static fr.insa.naho.modelinterface.GestionBDinterface.trouveObjetTitre;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;

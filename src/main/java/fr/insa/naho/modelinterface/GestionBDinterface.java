@@ -38,7 +38,7 @@ public class GestionBDinterface {
 
     public static Connection defautConnect()
             throws ClassNotFoundException, SQLException {
-        return connectGeneralPostGres("localhost", 5432, "postgres", "postgres", "pass"); //Le port c'est du 5432 sur ordi perso et du 5439 sur ordi de l'école
+        return connectGeneralPostGres("localhost", 5439, "postgres", "postgres", "pass"); //Le port c'est du 5432 sur ordi perso et du 5439 sur ordi de l'école
         // donc si le port n'est pas changé modifie le!
     }
 
@@ -433,7 +433,7 @@ public class GestionBDinterface {
         }
         return utilisateurs;
     }
-    
+
     public static ArrayList<Objet> afficheAllObjets(Connection con) throws SQLException {
 //afficher tous les objets déposés dans la bdd
         ArrayList<Objet> objets = new ArrayList<>();
@@ -447,8 +447,8 @@ public class GestionBDinterface {
 
             while (result.next()) {
                 Objet obj = new Objet(result.getInt("id"), result.getString("titre"), result.getString("description"),
-                       result.getTimestamp("debut"),result.getTimestamp("fin"), result.getInt("prixbase"), 
-                        result.getInt("proposepar"), result.getInt("categoriegenerale"),result.getInt("categorie"));
+                        result.getTimestamp("debut"), result.getTimestamp("fin"), result.getInt("prixbase"),
+                        result.getInt("proposepar"), result.getInt("categoriegenerale"), result.getInt("categorie"));
                 objets.add(obj);
                 for (int i = 0; i < objets.size(); i++) {
                     System.out.println(objets.get(i).toString());
@@ -544,6 +544,12 @@ public class GestionBDinterface {
     }
 
     public static class CategorieNexistePasException extends Exception {
+    }
+
+    public static class PasObjetDeposesException extends Exception {
+    }
+
+    public static class AucunObjetVouluException extends Exception {
     }
 
     public static class UtilisateurNexistePasException extends Exception {
@@ -924,10 +930,9 @@ public class GestionBDinterface {
 
                 objets.add(objet);
                 int maxi = getMax(con, objet);
-                System.out.println("Le montant de l'enchère maximale est de :"+" "+maxi+ " "+ "euros");
+                System.out.println("Le montant de l'enchère maximale est de :" + " " + maxi + " " + "euros");
 
             }
-
 
         } catch (SQLException ex) {
             System.out.println("problème: " + ex.getMessage());
@@ -996,7 +1001,7 @@ public class GestionBDinterface {
 
                 objets.add(objet);
                 int maxi = getMax(con, objet);
-                System.out.println("Le montant de l'enchère maximale est de :"+" "+maxi+ " "+ "euros");
+                System.out.println("Le montant de l'enchère maximale est de :" + " " + maxi + " " + "euros");
 
             }
 
@@ -1033,7 +1038,7 @@ public class GestionBDinterface {
                         rs.getTimestamp("fin"), rs.getInt("prixbase"), rs.getInt("proposepar"), rs.getInt("categoriegenerale"),
                         rs.getInt("categorie"));
                 int maxi = getMax(con, objet);
-                System.out.println("Le montant de l'enchère maximale est de :"+" "+maxi+ " "+ "euros");
+                System.out.println("Le montant de l'enchère maximale est de :" + " " + maxi + " " + "euros");
                 objets.add(objet);
             }
 
@@ -1043,6 +1048,42 @@ public class GestionBDinterface {
         return objets;
     }
 
+     public static ArrayList<Objet> trouveObjetTitre(Connection con, String mot) throws SQLException {
+        ArrayList<Objet> objets = new ArrayList<>();
+        con.setAutoCommit(false);
+        try ( PreparedStatement searchobjett = con.prepareStatement(
+                """
+         select * from objet where titre like ?
+                         order by titre asc
+        
+        """
+        )) {
+
+            searchobjett.setString(1, "%" + mot + "%");
+            ResultSet rs = searchobjett.executeQuery();
+
+            while (rs.next()) {
+
+                System.out.println("voici les infos pour l'objet d'identifiant :" + " " + rs.getInt("id"));
+                System.out.println("titre: " + " " + rs.getString("titre"));
+                System.out.println("description: " + " " + rs.getString("description"));
+                System.out.println("date de mise en enchere: " + " " + rs.getTimestamp("debut"));
+                System.out.println("date de fin de la mise en enchere: " + " " + rs.getTimestamp("fin"));
+                System.out.println("le prix de base est de: " + " " + rs.getInt("prixbase") + " " + "euros");
+                Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("description"), rs.getTimestamp("debut"),
+                        rs.getTimestamp("fin"), rs.getInt("prixbase"), rs.getInt("proposepar"), rs.getInt("categoriegenerale"),
+                        rs.getInt("categorie"));
+                int maxi = getMax(con, objet);
+                System.out.println("Le montant de l'enchère maximale est de :" + " " + maxi + " " + "euros");
+                objets.add(objet);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("problème: " + ex.getMessage());
+        }
+        return objets;
+    }
+     
     public static ArrayList<Objet> trouveObjetCodePostal(Connection con, String codepostal) throws SQLException {
         ArrayList<Objet> objets = new ArrayList<>();
         con.setAutoCommit(false);
@@ -1074,7 +1115,7 @@ public class GestionBDinterface {
 
                 objets.add(objet);
                 int maxi = getMax(con, objet);
-                System.out.println("Le montant de l'enchère maximale est de :"+" "+maxi+ " "+ "euros");
+                System.out.println("Le montant de l'enchère maximale est de :" + " " + maxi + " " + "euros");
             }
 
         } catch (SQLException ex) {
@@ -1106,27 +1147,26 @@ public class GestionBDinterface {
             ResultSet testNom = searchuser.executeQuery();
 
             boolean exist = false;
-
-            while (testNom.next()) { 
-                exist = true;
-
-                if (exist == true) {
-
+            if (testNom.next()) {
+                while (testNom.next()) {
+                    exist = true;
 
                     Objet objet = new Objet(testNom.getInt("id"), testNom.getString("titre"), testNom.getString("description"), testNom.getTimestamp("debut"),
                             testNom.getTimestamp("fin"), testNom.getInt("prixbase"), testNom.getInt("proposepar"), testNom.getInt("categoriegenerale"),
                             testNom.getInt("categorie"));
 
                     objets.add(objet);
-                     for (int i = 0; i < objets.size(); i++) {
-                    System.out.println(objets.get(i).toString());
-            }
-                } else {
-
-                    System.out.println("Pas encore d'objet mis en enchère");
+                    for (int i = 0; i < objets.size(); i++) {
+                        System.out.println(objets.get(i).toString());
+                    }
                 }
+            } else {
+
+                System.out.println("Pas encore d'objet mis en enchère");
+                throw new PasObjetDeposesException();
             }
-        } catch (Exception ex) {
+
+        } catch (PasObjetDeposesException ex) {
             System.out.println(" " + ex.getMessage());
 
         }
@@ -1134,9 +1174,9 @@ public class GestionBDinterface {
     }
 
     public static ArrayList<Objet> mesObjetsVoulus(Connection con, String emailuser) throws SQLException {
-       //ANCIENNEMENT MESENCHERES!!
-       //JE L'AI RENOMMEE
-       //un utilisateur entre son mail et on lui renvoie les infos des objet sur lesquels il a encheri
+        //ANCIENNEMENT MESENCHERES!!
+        //JE L'AI RENOMMEE
+        //un utilisateur entre son mail et on lui renvoie les infos des objet sur lesquels il a encheri
 
         ArrayList<Objet> objets = new ArrayList<>();
         con.setAutoCommit(false);
@@ -1153,34 +1193,37 @@ public class GestionBDinterface {
                 """
         )) {
 
-            searchuser.setString(1, emailuser); 
+            searchuser.setString(1, emailuser);
             ResultSet testNom = searchuser.executeQuery();
 
             boolean exist = false;
-            while (testNom.next()) { 
-                exist = true;
 
-            if (exist == true) {
+            if (testNom.next()) {
+
+                while (testNom.next()) {
+                    exist = true;
 
 //                   
-
                     Objet objet = new Objet(testNom.getInt("id"), testNom.getString("titre"), testNom.getString("description"), testNom.getTimestamp("debut"),
                             testNom.getTimestamp("fin"), testNom.getInt("prixbase"), testNom.getInt("proposepar"), testNom.getInt("categoriegenerale"),
                             testNom.getInt("categorie"));
 
                     objets.add(objet);
-                     for (int i = 0; i < objets.size(); i++) {
-                    System.out.println(objets.get(i).toString());
-                     
-                    int maxi = getMax(con, objet);
-                    System.out.println("L'enchère maximale faite sur cet objet est de"+ " "+maxi+ " "+"euros");
-                     }
-                } else {
-                    
-                    System.out.println("Vous n'avez encore encheri sur aucun objet");
+                    for (int i = 0; i < objets.size(); i++) {
+                        System.out.println(objets.get(i).toString());
+
+                        int maxi = getMax(con, objet);
+                        System.out.println("L'enchère maximale faite sur cet objet est de" + " " + maxi + " " + "euros");
+                    }
+
                 }
+            } else {
+
+                System.out.println("Vous n'avez encore encheri sur aucun objet");
+                throw new AucunObjetVouluException();
             }
-        } catch (Exception ex) {
+
+        } catch (AucunObjetVouluException ex) {
             throw new Error(ex);
         }
         return objets;
@@ -1191,8 +1234,8 @@ public class GestionBDinterface {
 
         con.setAutoCommit(false);
         try ( PreparedStatement cherchemdp = con.prepareStatement(
-                "select id from utilisateur where motdepasse = ?")) { 
-            cherchemdp.setString(1, oldmdp); 
+                "select id from utilisateur where motdepasse = ?")) {
+            cherchemdp.setString(1, oldmdp);
             ResultSet testmdp = cherchemdp.executeQuery();
             if (testmdp.next()) {
                 System.out.println("Nous avons retrouvé l'utilisateur concerné.");
@@ -1226,8 +1269,8 @@ public class GestionBDinterface {
 
         con.setAutoCommit(false);
         try ( PreparedStatement cherchemail = con.prepareStatement(
-                "select id from utilisateur where email = ?")) { 
-            cherchemail.setString(1, oldemail); 
+                "select id from utilisateur where email = ?")) {
+            cherchemail.setString(1, oldemail);
             ResultSet testmail = cherchemail.executeQuery();
             if (testmail.next()) {
                 System.out.println("Nous avons retrouvé l'utilisateur concerné.");
@@ -1258,11 +1301,11 @@ public class GestionBDinterface {
 
     public static void updateObjetFin(Connection con, String titre, Timestamp fin)
             throws SQLException, ObjetNexistePasException {
-       
+
         con.setAutoCommit(false);
         try ( PreparedStatement cherchetitre = con.prepareStatement(
-                "select id from objet where titre = ?")) { 
-            cherchetitre.setString(1, titre); 
+                "select id from objet where titre = ?")) {
+            cherchetitre.setString(1, titre);
             ResultSet testTitre = cherchetitre.executeQuery();
             if (testTitre.next()) {
                 System.out.println("Nous avons retrouvé l'objet concerné.");
@@ -1342,7 +1385,7 @@ public class GestionBDinterface {
         con.setAutoCommit(false);
         try ( PreparedStatement searchcat = con.prepareStatement("select id from categorie where nom = ?")) {
 
-            searchcat.setString(1, nomcat); 
+            searchcat.setString(1, nomcat);
             ResultSet testCat = searchcat.executeQuery();
 
             boolean exist = false;
@@ -1375,7 +1418,7 @@ public class GestionBDinterface {
         """
         )) {
 
-            searchobjet.setString(1, nomobjet); 
+            searchobjet.setString(1, nomobjet);
             ResultSet rs = searchobjet.executeQuery();
             System.out.println("voici l'ensemble des encheres faites sur cet objet:");
 
@@ -1384,9 +1427,9 @@ public class GestionBDinterface {
                 Enchere enchere = new Enchere(rs.getInt("id"), rs.getTimestamp("quand"),
                         rs.getInt("montant"), rs.getInt("sur"), rs.getInt("de"));
                 encheres.add(enchere);
-                 for (int i = 0; i < encheres.size(); i++) {
+                for (int i = 0; i < encheres.size(); i++) {
                     System.out.println(encheres.get(i).toString());
-            }
+                }
 
             }
 
@@ -1396,8 +1439,8 @@ public class GestionBDinterface {
 
         return encheres;
     }
-    
-     public static ArrayList<Enchere> afficheEncheresDeMesObjets(Connection con, String emailuser) throws SQLException {
+
+    public static ArrayList<Enchere> afficheEncheresDeMesObjets(Connection con, String emailuser) throws SQLException {
 //méthode qui affiche les infos de toutes les enchères faites sur tous les objets déposés par un user
         ArrayList<Enchere> encheres = new ArrayList<>();
         con.setAutoCommit(false);
@@ -1419,9 +1462,9 @@ public class GestionBDinterface {
                 Enchere enchere = new Enchere(rs.getInt("id"), rs.getTimestamp("quand"),
                         rs.getInt("montant"), rs.getInt("sur"), rs.getInt("de"));
                 encheres.add(enchere);
-                 for (int i = 0; i < encheres.size(); i++) {
+                for (int i = 0; i < encheres.size(); i++) {
                     System.out.println(encheres.get(i).toString());
-            }
+                }
 
             }
 
@@ -1431,7 +1474,6 @@ public class GestionBDinterface {
 
         return encheres;
     }
-
 
     public static boolean login(Connection con, String mail, String mdp) throws Exception { //choisir un utilisateur à partir de son nom et renvoyer ses infos
 
@@ -1478,7 +1520,7 @@ public class GestionBDinterface {
         """
         )) {
 
-            searchcat.setString(1, nomcatgen); 
+            searchcat.setString(1, nomcatgen);
             ResultSet rs = searchcat.executeQuery();
 
             System.out.println("Voici l'ensemble des sous-catégories recherchées:");
@@ -1490,10 +1532,10 @@ public class GestionBDinterface {
                 categories.add(categorie);
                 for (int i = 0; i < categories.size(); i++) {
                     System.out.println(categories.get(i).toString());
-            }
+                }
 
-        }
-        }catch (SQLException ex) {
+            }
+        } catch (SQLException ex) {
             System.out.println("Problème" + ex.getMessage());
         }
 
@@ -1520,10 +1562,10 @@ public class GestionBDinterface {
                 System.out.println("Catégories générales" + rs.getString("nom"));
                 Categoriegenerale categoriegenerale = new Categoriegenerale(rs.getInt("id"), rs.getString("nom"));
                 categoriesgenerales.add(categoriegenerale);
-                
-                 for (int i = 0; i < categoriesgenerales.size(); i++) {
+
+                for (int i = 0; i < categoriesgenerales.size(); i++) {
                     System.out.println(categoriesgenerales.get(i).toString());
-            }
+                }
             }
 
         } catch (SQLException ex) {
@@ -1546,37 +1588,37 @@ public class GestionBDinterface {
                     "beuvron@gmail.com", "prof", "67000");
             int cg1 = createCategorieGenerale(con, "Meubles");
             int cg2 = createCategorieGenerale(con, "Accessoires");
-            int cg3= createCategorieGenerale(con, "Vehicules");
+            int cg3 = createCategorieGenerale(con, "Vehicules");
             int c1 = createCategorie(con, "Lits", cg1);
             int c2 = createCategorie(con, "Chaises", cg1);
-            int c3=createCategorie(con, "Bijoux", cg2);
-            int c4= createCategorie(con, "Sacs", cg2);
-            int c5=createCategorie(con, "Voitures", cg3);
-            int c6= createCategorie(con, "Vélos", cg3);
-            
+            int c3 = createCategorie(con, "Bijoux", cg2);
+            int c4 = createCategorie(con, "Sacs", cg2);
+            int c5 = createCategorie(con, "Voitures", cg3);
+            int c6 = createCategorie(con, "Vélos", cg3);
+
             int o1 = createObjet(con, "Lit en hauteur", "lit pratique, rouge, bien pour les enfants",
                     new Timestamp(System.currentTimeMillis()),
-                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 48000*1000),
+                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 48000 * 1000),
                     20, u1, cg1, c1);
             int o2 = createObjet(con, "Chaise en cuir", "chaise confortable, noire, siège chauffant",
                     new Timestamp(System.currentTimeMillis()),
-                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 48000*1000),
+                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 48000 * 1000),
                     150, u2, cg1, c2);
             int o3 = createObjet(con, "Pendentif soleil", "or plaqué, très joli",
                     new Timestamp(System.currentTimeMillis()),
-                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 24000*1000),
+                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 24000 * 1000),
                     35, u3, cg2, c3);
             int o4 = createObjet(con, "sac à dos", "marque quechua, gris, contient beaucoup d'espace",
                     new Timestamp(System.currentTimeMillis()),
-                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 48000*1000),
+                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 48000 * 1000),
                     20, u4, cg2, c4);
             int o5 = createObjet(con, "Peugeot 306", "vieille voiture, jaune orangé, encore en excellent état, petit bolide",
                     new Timestamp(System.currentTimeMillis()),
-                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 72000*1000),
+                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 72000 * 1000),
                     1500, u1, cg3, c5);
-            int o6 = createObjet(con, "bicyclette", "rose avec un panier à l'avant"+"/n"+"Elle appartenait à Marilyn Monroe ",
+            int o6 = createObjet(con, "bicyclette", "rose avec un panier à l'avant" + "/n" + "Elle appartenait à Marilyn Monroe ",
                     new Timestamp(System.currentTimeMillis()),
-                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 72000*1000),
+                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 72000 * 1000),
                     20, u1, cg1, c1);
             createEnchere(con, new Timestamp(System.currentTimeMillis()), 30, o1, u2);
             createEnchere(con, new Timestamp(System.currentTimeMillis()), 160, o2, u3);
@@ -1584,7 +1626,7 @@ public class GestionBDinterface {
             createEnchere(con, new Timestamp(System.currentTimeMillis()), 21, o4, u1);
             createEnchere(con, new Timestamp(System.currentTimeMillis()), 1600, o5, u2);
             createEnchere(con, new Timestamp(System.currentTimeMillis()), 25, o6, u3);
-            
+
             System.out.println("Utilisateurs, Catégories, Objets et Enchères ajoutés avec succès");
 
         } catch (Exception ex) {
@@ -1593,18 +1635,15 @@ public class GestionBDinterface {
         }
 
     }
-    
-    public static void recreationbdd(Connection con) throws SQLException, Exception{
+
+    public static void recreationbdd(Connection con) throws SQLException, Exception {
         //efface et recrée la bdd mais ne permet pas d'ajouter d'enchère, il faudra le faire manuellement
-        try{
+        try {
             deleteSchema(con);
             creeSchema(con);
             recreatebdd(con);
-        } catch (Exception ex){
-          System.out.println("Problème" + ex.getMessage());  
+        } catch (Exception ex) {
+            System.out.println("Problème" + ex.getMessage());
         }
     }
 }
-
-
-
