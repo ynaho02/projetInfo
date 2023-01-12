@@ -4,20 +4,17 @@
  */
 package fr.insa.naho.modelinterface;
 
-
-
-import fr.insa.naho.model.GestionBD;
+ 
 import static fr.insa.naho.modelinterface.GestionBDinterface.afficheAllObjets;
 import static fr.insa.naho.modelinterface.GestionBDinterface.afficheEnchere;
 import static fr.insa.naho.modelinterface.GestionBDinterface.afficheEncheresDeMesObjets;
 import static fr.insa.naho.modelinterface.GestionBDinterface.afficheUsers;
-import static fr.insa.naho.modelinterface.GestionBDinterface.creeSchema;
 import static fr.insa.naho.modelinterface.GestionBDinterface.defautConnect;
-import static fr.insa.naho.modelinterface.GestionBDinterface.deleteSchema;
 import static fr.insa.naho.modelinterface.GestionBDinterface.demandeCategorie;
 import static fr.insa.naho.modelinterface.GestionBDinterface.demandeUpdateFin;
 import static fr.insa.naho.modelinterface.GestionBDinterface.login;
-import static fr.insa.naho.modelinterface.GestionBDinterface.recreatebdd;
+import static fr.insa.naho.modelinterface.GestionBDinterface.mesObjets;
+import static fr.insa.naho.modelinterface.GestionBDinterface.mesObjetsVoulus;
 import static fr.insa.naho.modelinterface.GestionBDinterface.recreationbdd;
 import static fr.insa.naho.modelinterface.GestionBDinterface.trouveObjetCat;
 import static fr.insa.naho.modelinterface.GestionBDinterface.trouveObjetCatGen;
@@ -28,7 +25,12 @@ import static fr.insa.naho.modelinterface.GestionBDinterface.trouveUtilisateurMa
 import static fr.insa.naho.modelinterface.GestionBDinterface.trouveidCategorie;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Timestamp;
+
+
+
+
+
+
 
 
 /**
@@ -40,23 +42,26 @@ public class MainAppinterface {
     public static void main(String[] args) {
 
         try ( Connection con = defautConnect())  { //defautconnect renvoie une connection. Une fois que cette méthode est appelé ton sgbd est actif et tu peux accéder a la database depuis java
+          
             System.out.println("connection réussie"); //si la connection est établie ca te l'affiche, si tu n'as rien c'est que non
-         MenuTexte(con); //Toutes mes méthodes prennent au minimun une connection en entrée. Cette connection c'est celle qui t'aura été fournie après le défaut connect. Ca veut dire que toutes les méthodes dont tu te serviras auront forcément un impact sur la bdd 
+    //afficheEnchere(con,"bicyclette");
+            //mesObjetsVoulus(con,"naho@gmail.com");
+//MenuTexte(con); //Toutes mes méthodes prennent au minimun une connection en entrée. Cette connection c'est celle qui t'aura été fournie après le défaut connect. Ca veut dire que toutes les méthodes dont tu te serviras auront forcément un impact sur la bdd 
         } catch (Exception ex) {
             throw new Error(ex);
         }
     }
 
-    public static void MenuTexte(Connection con) throws SQLException, GestionBD.UtilisateurNexistePasException, GestionBD.CategorieNexistePasException, GestionBD.CategorieExisteDejaException, GestionBD.ObjetNexistePasException, GestionBD.MontantTropPetitException, GestionBD.DelaiDEnchereDepasseException, Exception {
+    public static void MenuTexte(Connection con) throws Exception {
           
-        System.out.println("Veuillez vous connecter pour continuer.");
-        
-        System.out.println("Entrez votre adresse mail:");
-                            String email = Lire.S();
-                            System.out.println("Entrez votre mot de passe:");
-                            String mdep = Lire.S();
-                            boolean oui = login(con, email, mdep);
- if (oui==true){
+//        System.out.println("Veuillez vous connecter pour continuer.");
+//        
+//        System.out.println("Entrez votre adresse mail:");
+//                            String email = Lire.S();
+//                            System.out.println("Entrez votre mot de passe:");
+//                            String mdep = Lire.S();
+//                            boolean oui = login(con, email, mdep);
+// if (oui==true){
         int m = -1;
 
         char u = 0;
@@ -149,29 +154,38 @@ public class MainAppinterface {
                         }
 
                         if (m == 4) {
-                            GestionBDinterface.mesObjets(con, email);
+                           System.out.println("Entrez mail");
+                            String emailuser= Lire.S();
+                            mesObjets(con, emailuser);
                         }
 
                        
                         if (m == 5) {
-                           GestionBDinterface.mesObjetsVoulus(con, email);
+                           System.out.println("Entrez mail");
+                            String emailuser= Lire.S();
+                           mesObjetsVoulus(con, emailuser);
                         }
                         if (m==6){
-                            
-                            afficheEncheresDeMesObjets(con,email);
+                            System.out.println("Entrez mail");
+                            String emailuser= Lire.S();
+                            afficheEncheresDeMesObjets(con,emailuser);
                         }
-                        if (m == 8) {
+                        if (m == 7) {
+                            System.out.println("Entrez ancien mail");
+                            String emailuser=Lire.S();
                             System.out.println("entrez votre nouvelle adresse mail");
                             String newemailuser = Lire.S();
                             
-                            GestionBDinterface.demandeUpdateEmail(con, email, newemailuser);
+                            GestionBDinterface.demandeUpdateEmail(con, emailuser, newemailuser);
                              System.out.println("Email modifié");
                         }
-                        if (m == 9) {
+                        if (m == 8) {
+                            System.out.println("Entrez ancien mdp");
+                            String oldmdp=Lire.S();
                             System.out.println("entrez votre nouveau mot de passe");
                             String newmdp = Lire.S();
                             
-                            GestionBDinterface.demandeUpdateMdp(con, mdep, newmdp);
+                            GestionBDinterface.demandeUpdateMdp(con, oldmdp, newmdp);
                             
                             System.out.println("Mot de passe modifié");
                         }
@@ -236,8 +250,9 @@ public class MainAppinterface {
 
                             System.out.println("Votre objet appartient à une sous-catégorie spécifique, veuillez l'entrez.");
                             String nomcat = Lire.S();
-
-                            GestionBDinterface.demandeObjet(con, titre, description, prixbase, annee, mois, date, Fin, nomcatgen, nomcat, email);
+                            System.out.println("Entrez mail");
+                            String emailuser=Lire.S();
+                            GestionBDinterface.demandeObjet(con, titre, description, prixbase, annee, mois, date, Fin, nomcatgen, nomcat, emailuser);
 
                             System.out.println("Objet ajouté avec succès.");
 
@@ -391,9 +406,10 @@ public class MainAppinterface {
 
                             System.out.println("Entrez le montant de votre offre:");
                             int offre = Lire.i();
-
+                            System.out.println("Entrez mail");
+                            String emailuser=Lire.S();
                             try {
-                                GestionBDinterface.demandeEnchere(con, titreobj, offre, email);
+                                GestionBDinterface.demandeEnchere(con, titreobj, offre, emailuser);
                             } catch (Exception ex) {
                                 System.out.println("Problème détécté quelque part,il faut recommencer.");
                             }
@@ -426,8 +442,8 @@ public class MainAppinterface {
 
         }
 
-    } else {
-     System.out.println("Oups, erreur de connection, réessayer avec d'autres identifiants.");
- }
+//    } else {
+//     System.out.println("Oups, erreur de connection, réessayer avec d'autres identifiants.");
+// }
     }
 }
