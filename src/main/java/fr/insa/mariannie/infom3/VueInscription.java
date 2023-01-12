@@ -4,7 +4,8 @@
  */
 package fr.insa.mariannie.infom3;
 
-import fr.insa.naho.model.GestionBD;
+
+import fr.insa.naho.modelinterface.GestionBDinterface;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Optional;
@@ -92,13 +93,13 @@ public class VueInscription extends GridPane {
                 }
             try{
                 boolean test = true;
-                /*test=*/ GestionBD.demandeUtilisateur(this.main.getCon(), this.tfnom.getText(), this.tfprenom.getText(),this.tfmail.getText(), 
+                /*test=*/ GestionBDinterface.demandeUtilisateur(this.main.getCon(), this.tfnom.getText(), this.tfprenom.getText(),this.tfmail.getText(), 
                     this.pfpass.getText(), this.tfcodepostal.getText());
                     //createUtilisateur(this.main.getCon(),this.tfnom.getText(),this.tfprenom.getText(),this.tfmail.getText(),
                     //this.tfcodepostal.getText(),this.pfpass.getText());
             this.main.setCurUserMail(this.tfmail.getText());
             this.main.setCenter(new VueGlobale(this.main));
-        }catch (SQLException ex) {
+        }catch (Exception ex) {
                 Utils.showErrorInAlert("Pb bdd", "erreur création compte", ex.getLocalizedMessage());
             }
             

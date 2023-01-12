@@ -4,7 +4,7 @@
  */
 package fr.insa.mariannie.infom3;
 
-import fr.insa.naho.model.GestionBD;
+
 import java.sql.SQLException;
 import static javafx.geometry.HPos.LEFT;
 import javafx.geometry.Pos;

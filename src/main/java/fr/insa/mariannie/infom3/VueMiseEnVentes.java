@@ -5,7 +5,7 @@
 package fr.insa.mariannie.infom3;
 
 import com.sun.javafx.scene.control.MenuBarButton;
-import fr.insa.naho.model.GestionBD;
+
 import javafx.application.Application;
 import javafx.event.EventType;
 import javafx.scene.control.MenuButton;

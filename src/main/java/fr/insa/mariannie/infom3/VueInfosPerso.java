@@ -4,7 +4,8 @@
  */
 package fr.insa.mariannie.infom3;
 
-import fr.insa.naho.model.GestionBD;
+
+import fr.insa.naho.modelinterface.GestionBDinterface;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,7 +42,7 @@ public class VueInfosPerso extends GridPane {
         
         mesobjets.setOnAction((t) -> {
             try{
-            GestionBD.mesObjets(this.main.getCon(),this.main.getCurUserMail());
+            GestionBDinterface.mesObjets(this.main.getCon(),this.main.getCurUserMail());
             //this.main.setCenter(new VueGlobale(this.main));
                    }catch (SQLException ex) {
                 Utils.showErrorInAlert("PB", ex.getLocalizedMessage());

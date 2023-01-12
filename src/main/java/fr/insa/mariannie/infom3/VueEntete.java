@@ -4,7 +4,7 @@
  */
 package fr.insa.mariannie.infom3;
 
-import fr.insa.naho.model.GestionBD;
+
 import fr.insa.naho.modelinterface.GestionBDinterface;
 import fr.insa.naho.modelinterface.Objet;
 import java.sql.SQLException;

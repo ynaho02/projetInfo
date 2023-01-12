@@ -4,7 +4,8 @@
  */
 package fr.insa.mariannie.infom3;
 
-import fr.insa.naho.model.GestionBD;
+
+import fr.insa.naho.modelinterface.GestionBDinterface;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -43,7 +44,7 @@ public class MainPane extends BorderPane {
         try {
             this.controlleur=new Controlleur(this);
             
-            this.con = GestionBD.defautConnect();
+            this.con = GestionBDinterface.defautConnect();
             
             this.DeposerAnnonce = new ToggleButton("depose annonce");
             this.Categories = new ToggleButton("categories");

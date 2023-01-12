@@ -4,7 +4,8 @@
  */
 package fr.insa.mariannie.infom3;
 
-import fr.insa.naho.model.GestionBD;
+
+import fr.insa.naho.modelinterface.GestionBDinterface;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Optional;
@@ -54,14 +55,12 @@ public class VueLogin extends GridPane {
       
         login.setOnAction((t) -> {
             try {
-                GestionBD.login(this.main.getCon(),this.tfmail.getText(),
+                GestionBDinterface.login(this.main.getCon(),this.tfmail.getText(),
                         this.pass.getText());
                 this.main.setCurUserMail(this.tfmail.getText());
                 this.main.setCenter(new VueGlobale(this.main));
-            } catch (SQLException ex) {
-                Utils.showErrorInAlert("Pb bdd", "erreur login", ex.getLocalizedMessage());
             } catch (Exception ex) {
-                Logger.getLogger(VueLogin.class.getName()).log(Level.SEVERE, null, ex);
+                Utils.showErrorInAlert("Pb bdd", "erreur login", ex.getLocalizedMessage());
             }
         });
         this.add(this.login, 1, 6);
