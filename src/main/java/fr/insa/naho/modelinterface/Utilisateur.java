@@ -26,7 +26,29 @@ public class Utilisateur {
         this.motdepasse=motdepasse;
         this.codepostal=codepostal;
     }
+    public int getId() {
+        return id;
+    }
+    public String getNom() {
+        return nom;
+    }
+    public String getPrenom() {
+        return prenom;
+    }
     
+    public String getEmail() {
+        return email;
+    }
+    
+    public String getMdp() {
+        return motdepasse;
+    }
+    
+     public String getCodeP() {
+        return codepostal;
+    }
+     
+     
      @Override
     public String toString(){
        return "Utilisateur d'identifiant: "+" "+this.id +"\n"+ "nom:"+ " " +this.nom+"\n"+

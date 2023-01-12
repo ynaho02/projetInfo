@@ -20,6 +20,16 @@ public class Categorie {
         this.generale=generale;
         this.nom=nom;
     }
+      public int getId() {
+        return id;
+    }
+ public int getGenerale() {
+        return generale;
+    }
+ String getNom() {
+        return nom;
+    }
+
      @Override
     public String toString(){
        return "Catégorie numéro: "+" "+this.id +"\n"+ "nom:"+ " " +this.nom+"\n"+

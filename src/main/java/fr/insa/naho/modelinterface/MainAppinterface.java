@@ -48,18 +48,18 @@ public class MainAppinterface {
     }
 
     public static void MenuTexte(Connection con) throws SQLException, GestionBD.UtilisateurNexistePasException, GestionBD.CategorieNexistePasException, GestionBD.CategorieExisteDejaException, GestionBD.ObjetNexistePasException, GestionBD.MontantTropPetitException, GestionBD.DelaiDEnchereDepasseException, Exception {
-
+          
+        System.out.println("Veuillez vous connecter pour continuer.");
+        
+        System.out.println("Entrez votre adresse mail:");
+                            String email = Lire.S();
+                            System.out.println("Entrez votre mot de passe:");
+                            String mdep = Lire.S();
+                            boolean oui = login(con, email, mdep);
+ if (oui==true){
         int m = -1;
 
         char u = 0;
-//        
-//        System.out.println("Bienvenue sur le site de vente aux encheres!"); 
-//            System.out.println("S'il vous plait veuillez vous connecter"); 
-//             System.out.println("Entrez votre adresse mail:");
-//                            String mail = Lire.S();
-//                            System.out.println("Entrez votre  mot de passe:");
-//                            String mdp = Lire.S();
-//                            login(con, mail, mdp);b
 
         while (u != 'o') {
 
@@ -69,7 +69,7 @@ public class MainAppinterface {
             System.out.println("Entrez (c) si votre requete concerne la table objet");
             System.out.println("Entrez (d) si votre requete concerne la table categorie");
             System.out.println("Entrez (e) si votre requete concerne la table enchere");
-            System.out.println("Entrez (o) si vous avez rien à foutre ici");
+            System.out.println("Entrez (o) si vous voulez vous déconnecter");
             u = Lire.c();
             System.out.println("vous avez demandé \"" + u + "\"");
 
@@ -80,7 +80,7 @@ public class MainAppinterface {
                     while (m != 0) {
                         System.out.println("Bienvenue dans le menu ensemble de tables!");
                         System.out.println("Voici vos options");
-                        System.out.println("(1) Effacer puis recréer votre bdd ");
+                        System.out.println("(1) Effacer puis recréer votre bdd, des éléments seront ajoutés automatiquement. ");
                         System.out.println("(0) Quitter le menu");
                         System.out.println("Entrez votre choix");
                         m = Lire.i();
@@ -104,30 +104,22 @@ public class MainAppinterface {
 
                     while (m != 0) {
                         System.out.println("Bienvenue dans le menu utilisateur !");
-                        System.out.println("Voici vos options");
-                        System.out.println("(1) Se connecter");
-                        System.out.println("(2) Ajouter un utilisateur");
-                        System.out.println("(3) Retrouver un utilisateur en entrant son mail");
-                        System.out.println("(4) Afficher la liste de tous les utilisateurs");
-                        System.out.println("(5) Afficher l'ensemble des objets que vous avez mis en enchere");
-                        System.out.println("(6) Afficher l'ensemble des objets sur lesquels vous avez mis une enchère");
-                        System.out.println("(7) Voir toutes les enchères mises sur un de vos objets");
-                        System.out.println("(8) Modifier votre adresse mail");
-                        System.out.println("(9) Modifier votre mot de passe");
+                        System.out.println("Voici vos options:");
+                        System.out.println("(1) Ajouter un utilisateur");
+                        System.out.println("(2) Retrouver un utilisateur en entrant son mail");
+                        System.out.println("(3) Afficher la liste de tous les utilisateurs");
+                        System.out.println("(4) Afficher l'ensemble des objets que vous avez mis en enchere");
+                        System.out.println("(5) Afficher l'ensemble des objets sur lesquels vous avez posé une enchère");
+                        System.out.println("(6) Voir toutes les enchères mises sur un de vos objets");
+                        System.out.println("(7) Modifier votre adresse mail");
+                        System.out.println("(8) Modifier votre mot de passe");
                         System.out.println("(0) Quitter le menu");
                         System.out.println("Entrez votre choix");
                         m = Lire.i();
 
+                        
+
                         if (m == 1) {
-
-                            System.out.println("Entrez votre adresse mail:");
-                            String email = Lire.S();
-                            System.out.println("Entrez votre mot de passe:");
-                            String mdep = Lire.S();
-                            login(con, email, mdep);
-                        }
-
-                        if (m == 2) {
                             System.out.println("--- creation nouvel utilisateur");
                             System.out.println("Entrez votre nom, votre prénom et votre mail");
                             String nom = Lire.S();
@@ -143,7 +135,7 @@ public class MainAppinterface {
                             System.out.println("Utilisateur ajouté avec succès.");
                         }
 
-                        if (m == 3) {
+                        if (m == 2) {
                             System.out.println("entrez le mail de l'utilisateur recherché");
                             String tonmail = Lire.S();
 
@@ -151,45 +143,35 @@ public class MainAppinterface {
 
                         }
 
-                        if (m == 4) {
+                        if (m == 3) {
 
                             afficheUsers(con);
                         }
 
-                        if (m == 5) {
-                            System.out.println("entrez votre adresse mail");
-                            String emailuser = Lire.S();
-                            GestionBDinterface.mesObjets(con, emailuser);
+                        if (m == 4) {
+                            GestionBDinterface.mesObjets(con, email);
                         }
 
                        
-                        if (m == 6) {
-                            System.out.println("entrez votre adresse mail");
-                            String emailuser = Lire.S();
-                            GestionBDinterface.mesObjetsVoulus(con, emailuser);
+                        if (m == 5) {
+                           GestionBDinterface.mesObjetsVoulus(con, email);
                         }
-                        if (m==7){
+                        if (m==6){
                             
-                            System.out.println("Entrez votre adresse mail ");
-                            String emailuser = Lire.S();
-                            afficheEncheresDeMesObjets(con,emailuser);
+                            afficheEncheresDeMesObjets(con,email);
                         }
                         if (m == 8) {
-                            System.out.println("entrez votre ancienne adresse mail");
-                            String oldemailuser = Lire.S();
                             System.out.println("entrez votre nouvelle adresse mail");
                             String newemailuser = Lire.S();
                             
-                            GestionBDinterface.demandeUpdateEmail(con, oldemailuser, newemailuser);
+                            GestionBDinterface.demandeUpdateEmail(con, email, newemailuser);
                              System.out.println("Email modifié");
                         }
                         if (m == 9) {
-                            System.out.println("entrez votre ancien mot de passe");
-                            String oldmdp = Lire.S();
                             System.out.println("entrez votre nouveau mot de passe");
                             String newmdp = Lire.S();
                             
-                            GestionBDinterface.demandeUpdateMdp(con, oldmdp, newmdp);
+                            GestionBDinterface.demandeUpdateMdp(con, mdep, newmdp);
                             
                             System.out.println("Mot de passe modifié");
                         }
@@ -255,10 +237,7 @@ public class MainAppinterface {
                             System.out.println("Votre objet appartient à une sous-catégorie spécifique, veuillez l'entrez.");
                             String nomcat = Lire.S();
 
-                            System.out.println("A present il faut vous associer à cet objet, entrez donc votre adresse mail.");
-                            String emailuser = Lire.S();
-
-                            GestionBDinterface.demandeObjet(con, titre, description, prixbase, annee, mois, date, Fin, nomcatgen, nomcat, emailuser);
+                            GestionBDinterface.demandeObjet(con, titre, description, prixbase, annee, mois, date, Fin, nomcatgen, nomcat, email);
 
                             System.out.println("Objet ajouté avec succès.");
 
@@ -283,7 +262,7 @@ public class MainAppinterface {
                         }
                         
                         if (m == 5) {
-                            System.out.println("Entrez un mot clé pour chercher des objets correspondants");
+                            System.out.println("Entrez le titre d'un objet");
                             String mot = Lire.S();
                             trouveObjetTitre(con, mot);
                         }
@@ -413,10 +392,8 @@ public class MainAppinterface {
                             System.out.println("Entrez le montant de votre offre:");
                             int offre = Lire.i();
 
-                            System.out.println("A present vous allez vous identifier à votre enchere, entrez votre adresse mail:");
-                            String emailuser = Lire.S();
                             try {
-                                GestionBDinterface.demandeEnchere(con, titreobj, offre, emailuser);
+                                GestionBDinterface.demandeEnchere(con, titreobj, offre, email);
                             } catch (Exception ex) {
                                 System.out.println("Problème détécté quelque part,il faut recommencer.");
                             }
@@ -449,5 +426,8 @@ public class MainAppinterface {
 
         }
 
+    } else {
+     System.out.println("Oups, erreur de connection, réessayer avec d'autres identifiants.");
+ }
     }
 }

@@ -92,7 +92,7 @@ public class VueEntete extends HBox {
                 
                 this.main.setCenter(new VueAnnonces(this.main, objets));
 
-            } catch (SQLException ex) {
+            } catch (Exception ex) {
                 Utils.showErrorInAlert("PB", ex.getLocalizedMessage());
             }
         });
@@ -104,7 +104,7 @@ public class VueEntete extends HBox {
                 
                 this.main.setCenter(new VueAnnonces(this.main, objets));
 
-            } catch (SQLException ex) {
+            } catch (Exception ex) {
                 Utils.showErrorInAlert("PB", ex.getLocalizedMessage());
             }
         });
@@ -116,7 +116,7 @@ public class VueEntete extends HBox {
                 
                 this.main.setCenter(new VueAnnonces(this.main, objets));
 
-            } catch (SQLException ex) {
+            } catch (Exception ex) {
                 Utils.showErrorInAlert("PB", ex.getLocalizedMessage());
             }
         });
@@ -128,7 +128,7 @@ public class VueEntete extends HBox {
                 
                 this.main.setCenter(new VueAnnonces(this.main, objets));
 
-            } catch (SQLException ex) {
+            } catch (Exception ex) {
                 Utils.showErrorInAlert("PB", ex.getLocalizedMessage());
             }
         });
@@ -140,7 +140,7 @@ public class VueEntete extends HBox {
                 
                 this.main.setCenter(new VueAnnonces(this.main, objets));
 
-            } catch (SQLException ex) {
+            } catch (Exception ex) {
                 Utils.showErrorInAlert("PB", ex.getLocalizedMessage());
             }
         });
@@ -151,7 +151,7 @@ public class VueEntete extends HBox {
             ArrayList<Objet> objets =null ;
             try {
                 objets = GestionBDinterface.afficheAllObjets(this.main.getCon());
-            } catch (SQLException ex) {
+            } catch (Exception ex) {
                 Logger.getLogger(VueEntete.class.getName()).log(Level.SEVERE, null, ex);
             }
                 
