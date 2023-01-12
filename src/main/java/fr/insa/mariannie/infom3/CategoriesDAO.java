@@ -14,9 +14,9 @@ import javafx.collections.ObservableList;
 public class CategoriesDAO {
 
     public static ObservableList<Cat> getCatList() {
-        Cat transports = new Cat("TRAN", "Transports");
-        Cat meubles = new Cat("MEUB", "Meubles");
-        Cat habits = new Cat("HABI", "Habits");
+        Cat transports = new Cat("INFO", "Infos perso");
+        Cat meubles = new Cat("OBJ", "Mes Objets");
+        Cat habits = new Cat("ENCH", "Mes enchères");
 
         ObservableList<Cat> list //
                 = FXCollections.observableArrayList(transports, meubles, habits);

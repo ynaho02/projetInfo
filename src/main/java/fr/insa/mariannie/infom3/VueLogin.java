@@ -4,7 +4,13 @@
  */
 package fr.insa.mariannie.infom3;
 
+import fr.insa.naho.model.GestionBD;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -16,91 +22,54 @@ import javafx.scene.layout.GridPane;
  * @author alexa
  */
 public class VueLogin extends GridPane {
+
     private MainPane main;
-    private TextField text;
-    private Label nom;
-    private Label prenom;
+    private TextField tfmail;
+    private Label lMail;
+   
     private Label mdp;
     private Button login;
     private PasswordField pass;
-    private TextField textfield;
+    
     private Label bienvenue;
+    private String mail;
+    private String password;
 
     public VueLogin(MainPane aThis) {
-        this.main= aThis;
-        this.nom=new Label ("Nom:");
-        this.text =new TextField("");
-        this.add(this.nom, 0, 0);
-        this.add(this.text, 1, 0);
-       
-        this.prenom = new Label ("Prénom:");
-        this.textfield= new TextField ();
-        this.add(this.prenom, 0,2);
-        this.add(this.textfield, 1,1);
-        
-        this.mdp= new Label("Pass:");
-        this.pass= new PasswordField();
+        this.main = aThis;
+        this.lMail = new Label("Mail:");
+        this.tfmail = new TextField();
+        this.add(this.lMail, 0, 0);
+        this.add(this.tfmail, 1, 0);
+
+        this.mdp = new Label("Pass:");
+        this.pass = new PasswordField();
         this.add(this.mdp, 0, 2);
-        this.add(this.textfield, 1,2);
-        
-        this.bienvenue= new Label (" Dear Customer,welcome!");
-        this.add(this.bienvenue, 3,4);
-        
-        
-        this.login = new Button ("Login");
-        login.setOnAction((t)-> {
-            //Login();
-        });
-        this.add(this.login, 5,5);
-    }
-}
-    //}
-  
-   //public void Login(){
-       
-     // this.textfield = new TextField();
-     // this.pass= new PasswordField();
-      //try{
-       //    Optional<Utilisateur> user
-       //             = GestionBdD.login(this.main.getBdd(), nom, pass);
-          
-     // }  catch (SQLException ex) {
-        //    JavaFXUtils.showErrorInAlert("Pb bdd", "Erreur",
-          //          ex.getMessage());
-       
-   //}
-    /*ublic void doLogin() {
-        String nom = this.tfNom.getText();
-        String pass = this.pfPass.getText();
-        try {
-            Optional<Utilisateur> user
-                    = GestionBdD.login(this.main.getBdd(), nom, pass);
-            if (user.isEmpty()) {
-                JavaFXUtils.showErrorInAlert("Erreur", "utilisateur invalide", "");
-            } else {
-                this.main.getSessionInfo().setCurUser(user);
-                this.main.setEntete(new Label("connection OK"));
-                this.main.setMainContent(new Label("vous êtes " + user));
-            }
+        this.add(this.pass, 1, 2);
 
-        } catch (SQLException ex) {
-            JavaFXUtils.showErrorInAlert("Pb bdd", "Erreur",
-                    ex.getMessage());
-        }
-    }
-    
-    /*this.main = main;
-        this.getChildren().add(new Label("nom :"));
-        this.tfNom = new TextField();
-        this.getChildren().add(this.tfNom);
-        this.getChildren().add(new Label("pass :"));
-        this.pfPass = new PasswordField();
-        this.getChildren().add(this.pfPass);
-        Button bLogin = new Button("Login");
-        bLogin.setOnAction((t) -> {
-            doLogin();
-        });
-        this.getChildren().add(bLogin);*/
-//}
+        this.bienvenue = new Label(" Dear Customer,welcome back!");
+        this.add(this.bienvenue, 1, 5);
 
+        this.login = new Button("Login");
       
+        login.setOnAction((t) -> {
+            try {
+                GestionBD.login(this.main.getCon(),this.tfmail.getText(),
+                        this.pass.getText());
+                this.main.setCurUserMail(this.tfmail.getText());
+                this.main.setCenter(new VueGlobale(this.main));
+            } catch (SQLException ex) {
+                Utils.showErrorInAlert("Pb bdd", "erreur login", ex.getLocalizedMessage());
+            } catch (Exception ex) {
+                Logger.getLogger(VueLogin.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        });
+        this.add(this.login, 1, 6);
+        
+        this.setAlignment(Pos.CENTER);
+        this.setVgap(10);
+        this.setHgap(10);
+    }
+
+    
+}

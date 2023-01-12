@@ -22,7 +22,7 @@ public class Categories extends ComboBox<Cat> {
         ObservableList<Cat> list = CategoriesDAO.getCatList();
 
         this.setItems(list);
-        this.getSelectionModel().select(1) ;
+        this.getSelectionModel().select(0) ;
                 //a quoi sert cette ligne
 
     }

@@ -38,7 +38,7 @@ public class GestionBDinterface {
 
     public static Connection defautConnect()
             throws ClassNotFoundException, SQLException {
-        return connectGeneralPostGres("localhost", 5439, "postgres", "postgres", "pass"); //Le port c'est du 5432 sur ordi perso et du 5439 sur ordi de l'école
+        return connectGeneralPostGres("localhost", 5439, "postgres", "postgres", "admin"); //Le port c'est du 5432 sur ordi perso et du 5439 sur ordi de l'école
         // donc si le port n'est pas changé modifie le!
     }
 
@@ -437,10 +437,10 @@ public class GestionBDinterface {
     public static ArrayList<Objet> afficheAllObjets(Connection con) throws SQLException {
 //afficher tous les objets déposés dans la bdd
         ArrayList<Objet> objets = new ArrayList<>();
-        try {
+        try (PreparedStatement st = con.prepareStatement("Select * from objet")){;
+{
 
-            Statement st = con.createStatement();
-            ResultSet result = st.executeQuery("Select * from objet");
+            ResultSet result = st.executeQuery();
 
             System.out.println("ok voici la liste des objets :");
             System.out.println("------------------------");
@@ -455,8 +455,7 @@ public class GestionBDinterface {
                 }
 
             }
-        } catch (SQLException ex) {
-            throw new Error(ex);
+        } 
         }
         return objets;
     }
@@ -776,7 +775,7 @@ public class GestionBDinterface {
     public static void demandeObjet(Connection con, String titre, String description, int prixbase, int annee, int mois, int date, String Fin, String nomcatgen, String nomcat, String emailuser) throws Exception {
         ArrayList<Objet> objets = new ArrayList<>();
         boolean existe = true;
-        while (existe) {
+       while (existe) {
 
             Timestamp debut = new Timestamp(System.currentTimeMillis());
             Timestamp fin = Timestamp.valueOf(Fin); //valueof convertit un string en si on veut valeur d'une horloge
@@ -839,13 +838,15 @@ public class GestionBDinterface {
 
             try {
                 createObjet(con, titre, description, debut, fin, prixbase, proposepar, categoriegenerale, categorie);
-
+                existe = false;
+            
+                System.out.println("Objet ajouté avec succès.");
             } catch (Exception ex) {
                 System.out.println("Problème" + ex.getMessage());
 
             }
-
-        }
+       }
+        
 
     }
 
@@ -1501,7 +1502,7 @@ public class GestionBDinterface {
         } catch (Exception ex) {
             con.rollback();
             System.out.println("Problème" + ex.getMessage());
-            return false;
+            throw new Error (ex);
         }
         return true;
     }
@@ -1600,7 +1601,7 @@ public class GestionBDinterface {
                     new Timestamp(System.currentTimeMillis()),
                     new Timestamp(System.currentTimeMillis() + 60 * 60 * 48000 * 1000),
                     20, u1, cg1, c1);
-            int o2 = createObjet(con, "Chaise en cuir", "chaise confortable, noire, siège chauffant",
+            int o2 = createObjet(con, "Chaise en cuir", "chaise pratique, noire, siège chauffant",
                     new Timestamp(System.currentTimeMillis()),
                     new Timestamp(System.currentTimeMillis() + 60 * 60 * 48000 * 1000),
                     150, u2, cg1, c2);
