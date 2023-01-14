@@ -859,7 +859,7 @@ public class GestionBDinterface {
                 }
             } catch (CategorieNexistePasException ex) {
                 System.out.println(" la catégorie voulue n'existe pas, retournez dans le menu la créer");
-                throw new Error (ex);
+              throw new Error (ex);
             }
 
             try ( PreparedStatement chercheUs = con.prepareStatement(
@@ -876,7 +876,7 @@ public class GestionBDinterface {
                 }
             } catch (UtilisateurNexistePasException ex) {
                 System.out.println(" l'utilisateur n'est pas reconnu, retournez dans le menu l'ajouter");
-                throw new Error (ex);
+              throw new Error (ex);
             }
 
             try {
@@ -885,7 +885,7 @@ public class GestionBDinterface {
                 System.out.println("Objet ajouté avec succès.");
             } catch (Exception ex) {
                 System.out.println("Problème" + ex.getMessage());
-                throw new Error(ex);
+//                throw new Error(ex);
 
             }
        }
@@ -1038,9 +1038,10 @@ public class GestionBDinterface {
             searchobjet.setString(1, nom); //on indique ici que le premier point ? référence le nom
             ResultSet rs = searchobjet.executeQuery();
 
-            if (rs.next()){
+           
+                boolean auMoins1=false;
             while (rs.next()) {
-
+                auMoins1=true;
                 System.out.println("voici les infos pour l'objet d'identifiant :" + " " + rs.getInt("id"));
                 System.out.println("titre: " + " " + rs.getString("titre"));
                 System.out.println("description: " + " " + rs.getString("description"));
@@ -1067,7 +1068,7 @@ public class GestionBDinterface {
                 System.out.println("Le montant de l'enchère maximale est de :" + " " + maxi + " " + "euros");
             } 
             
-            }  else {
+            if(!auMoins1){
                     System.out.println("Pas d'objets correspondants.");
                     return null;
                     }
@@ -1093,9 +1094,9 @@ public class GestionBDinterface {
 
             searchobjett.setString(1, "%" + mot + "%");
             ResultSet rs = searchobjett.executeQuery();
-            if(rs.next()){
+            boolean auMoins1=false;
             while (rs.next()) {
-
+                auMoins1=true;
                 System.out.println("voici les infos pour l'objet d'identifiant :" + " " + rs.getInt("id"));
                 System.out.println("titre: " + " " + rs.getString("titre"));
                 System.out.println("description: " + " " + rs.getString("description"));
@@ -1122,7 +1123,7 @@ public class GestionBDinterface {
                 System.out.println("Le montant de l'enchère maximale est de :" + " " + maxi + " " + "euros");
                 
             }
-            } else {
+            if(!auMoins1){
                 System.out.println("Aucun objet correspondant.");
                 return null;
             }
@@ -1141,13 +1142,14 @@ public class GestionBDinterface {
                          order by titre asc
         
         """
-        )) {
+       )) {
 
             searchobjett.setString(1, "%" + mot + "%");
             ResultSet rs = searchobjett.executeQuery();
-            if (rs.next()) {
+            boolean auMoinsUn = false;
+            
             while (rs.next()) {
-
+                 auMoinsUn = true;
                 System.out.println("voici les infos pour l'objet d'identifiant :" + " " + rs.getInt("id"));
                 System.out.println("titre: " + " " + rs.getString("titre"));
                 System.out.println("description: " + " " + rs.getString("description"));
@@ -1172,7 +1174,7 @@ public class GestionBDinterface {
                 System.out.println("Le montant de l'enchère maximale est de :" + " " + maxi + " " + "euros");
                 objets.add(objet);
             }
-            } else { 
+            if (! auMoinsUn) { 
                 System.out.println("Aucun objet trouvé.");
                 return null;
                 //throw new AucunObjetCorrespondException();
@@ -1183,6 +1185,8 @@ public class GestionBDinterface {
         }
         return objets;
     }
+     
+  
      
     public static ArrayList<Objet> trouveObjetCodePostal(Connection con, String codepostal) throws Exception {
         ArrayList<Objet> objets = new ArrayList<>();
@@ -1199,9 +1203,9 @@ public class GestionBDinterface {
 
             searchobjett.setString(1, "%" + codepostal + "%");
             ResultSet rs = searchobjett.executeQuery();
-            if(rs.next()) {
+            boolean auMoins1=false;
             while (rs.next()) {
-
+                 auMoins1=true;
                 System.out.println("voici les infos pour l'objet d'identifiant :" + " " + rs.getInt("id"));
                 System.out.println("titre: " + " " + rs.getString("titre"));
                 System.out.println("description: " + " " + rs.getString("description"));
@@ -1226,7 +1230,7 @@ public class GestionBDinterface {
                 int maxi = getMax(con, objet);
                 System.out.println("Le montant de l'enchère maximale est de :" + " " + maxi + " " + "euros");
             }
-            } else {
+           if(!auMoins1){
                 System.out.println("Aucun objet trouvé.");
                 return null;
             } 
@@ -1259,10 +1263,11 @@ public class GestionBDinterface {
             ResultSet rs = searchuser.executeQuery();
 
             
-            if (rs.next()) {
+           
+                boolean auMoins1=false;
                 while (rs.next()) {
-                    
- System.out.println("voici les infos pour l'objet d'identifiant :" + " " + rs.getInt("id"));
+                    auMoins1=true;
+                System.out.println("voici les infos pour l'objet d'identifiant :" + " " + rs.getInt("id"));
                 System.out.println("titre: " + " " + rs.getString("titre"));
                 System.out.println("description: " + " " + rs.getString("description"));
                 System.out.println("date de mise en enchere: " + " " + rs.getTimestamp("debut"));
@@ -1296,10 +1301,10 @@ public class GestionBDinterface {
 //                        System.out.println(objets.get(i).toString());
 //                    }
                 }
-            } else {
+            if(!auMoins1) {
 
                 System.out.println("Pas encore d'objet mis en enchère");
-                throw new PasObjetDeposesException();
+               return null;
             }
 
         } catch (Exception ex) {
@@ -1334,11 +1339,10 @@ public class GestionBDinterface {
 
             
 
-            if (rs.next()) {
-
+                boolean auMoins1=false;
                 while (rs.next()) {
-                
-System.out.println("voici les infos pour l'objet d'identifiant :" + " " + rs.getInt("id"));
+                auMoins1=true;
+                System.out.println("voici les infos pour l'objet d'identifiant :" + " " + rs.getInt("id"));
                 System.out.println("titre: " + " " + rs.getString("titre"));
                 System.out.println("description: " + " " + rs.getString("description"));
                 System.out.println("date de mise en enchere: " + " " + rs.getTimestamp("debut"));
@@ -1377,10 +1381,10 @@ System.out.println("voici les infos pour l'objet d'identifiant :" + " " + rs.get
 //                    }
 
                 }
-            } else {
+            if(!auMoins1) {
 
                 System.out.println("Vous n'avez encore encheri sur aucun objet");
-                throw new AucunObjetVouluException();
+                return null;
             }
 
         } catch (Exception ex) {
@@ -1557,273 +1561,6 @@ System.out.println("voici les infos pour l'objet d'identifiant :" + " " + rs.get
         }
 
     }
-
-    public static ArrayList<Enchere> afficheEnchere(Connection con, String nomobjet) throws Exception {
-//méthode qui affiche les infos de toutes les enchères faites sur un objet donné
-        ArrayList<Enchere> encheres = new ArrayList<>();
-        con.setAutoCommit(false);
-        
-        try(PreparedStatement searchobj = con.prepareStatement(
-        """
-        select id from objet where titre=?
-        """
-        )){
-            searchobj.setString(1,nomobjet);
-            ResultSet rs = searchobj.executeQuery();
-            if (rs.next()){
-                System.out.println("voici l'ensemble des encheres faites sur cet objet:");
-                
-            } else {
-                System.out.println("L'objet concerné n'existe pas");
-                throw new ObjetNexistePasException();
-            }
-            
-            
-        }
-        try ( PreparedStatement searchobjet = con.prepareStatement(
-                """
-         select enchere.id, quand, montant,de, sur
-                         from enchere join objet on enchere.sur = objet.id
-                         where objet.titre = ?
-                         order by quand asc
-        
-        """
-        )) {
-
-            searchobjet.setString(1, nomobjet);
-            ResultSet rs = searchobjet.executeQuery();
-            
-            if(rs.next()){
-            while (rs.next()) {
-
-               System.out.println("Enchere numéro: "+" " + rs.getInt("id"));
-                System.out.println("Faite le: " +" "+ rs.getTimestamp("quand"));
-                System.out.println("D'un montant de: " +" "+ rs.getInt("montant")+" " + "euros");
-                String user = retrouveNomUser(con, rs.getInt("de"));
-                System.out.println("Par l'utilisateur d'identifiant: "+" " + user);
-            }
-            } else {
-                System.out.println("Pas encore d'enchères faites sur cet objet");
-                return null;
-            }
-
-        } catch (Exception ex) {
-            System.out.println("Problème" + ex.getMessage());
-        }
-
-        return encheres;
-    }
-
-    public static ArrayList<Enchere> afficheEncheresDeMesObjets(Connection con, String emailuser) throws Exception {
-//méthode qui affiche les infos de toutes les enchères faites sur tous les objets déposés par un user
-        ArrayList<Enchere> encheres = new ArrayList<>();
-        con.setAutoCommit(false);
-        try ( PreparedStatement searchobjet = con.prepareStatement(
-                """
-         select enchere.id, quand,montant,sur,de from enchere join objet 
-         on enchere.sur = objet.id where objet.proposepar = (select id from utilisateur where email = ?)
-                         order by quand asc
-        
-        """
-        )) {
-
-            searchobjet.setString(1, emailuser);
-            ResultSet rs = searchobjet.executeQuery();
-            System.out.println("voici l'ensemble des encheres faites sur cet objet:");
-            if (rs.next()){
-            while (rs.next()) {
-System.out.println("Enchere numéro: "+" " + rs.getInt("id"));
-                System.out.println("Faite le: " +" "+ rs.getTimestamp("quand"));
-                System.out.println("D'un montant de: " +" "+ rs.getInt("montant")+" " + "euros");
-                String user = retrouveNomUser(con, rs.getInt("de"));
-                System.out.println("Par l'utilisateur d'identifiant: "+" " + user);
-
-            }
-            } else { 
-                    System.out.println("Pas d'enchère faites sur vos objets");
-                    return null;
-                    }
-
-        } catch (Exception ex) {
-            System.out.println("Problème" + ex.getMessage());
-        }
-
-        return encheres;
-    }
-
-    public static boolean login(Connection con, String mail, String mdp) throws Exception { //choisir un utilisateur à partir de son nom et renvoyer ses infos
-
-        con.setAutoCommit(false);
-        try ( PreparedStatement searchuser = con.prepareStatement("select * from utilisateur where email=? and motdepasse = ?")) {
-
-            searchuser.setString(1, mail);
-            searchuser.setString(2, mdp);
-            ResultSet testNom = searchuser.executeQuery();
-
-           
-            if (testNom.next()) {
-                
-                    System.out.println("Login successful");
-                    return true;
-
-            }else {
-                return false;
-                }
-            
-
-        } catch (Exception ex) {
-            con.rollback();
-            System.out.println("Problème" + ex.getMessage());
-            throw new Error (ex);
-        }
-        
-    }
-
-    public static ArrayList<Categorie> afficheallcats1(Connection con, String nomcatgen) throws Exception {
-//afficher les sous catégories en entrant une catégorie générale
-        ArrayList<Categorie> categories = new ArrayList<>();
-        con.setAutoCommit(false);
-        try ( PreparedStatement searchcat = con.prepareStatement(
-                """
-         select categorie.nom, categorie.id, generale
-                         from categoriegenerale join categorie on categoriegenerale.id = categorie.generale
-                         where categoriegenerale.nom = ?
-                         order by categoriegenerale.nom asc
-        
-        """
-        )) {
-
-            searchcat.setString(1, nomcatgen);
-            ResultSet rs = searchcat.executeQuery();
-
-            System.out.println("Voici l'ensemble des sous-catégories recherchées:");
-            if (rs.next()){
-            while (rs.next()) {
-
-                System.out.println("" + rs.getString("nom"));
-                Categorie categorie = new Categorie(rs.getInt("id"), rs.getInt("generale"), rs.getString("nom"));
-                categories.add(categorie);
-//                for (int i = 0; i < categories.size(); i++) {
-//                    System.out.println(categories.get(i).toString());
-//                }
-
-            }
-            } else { 
-                System.out.println("Aucune catégorie générale correspondate");
-                throw new CategorieGenNexistePasException();
-            }
-        } catch (Exception ex) {
-            System.out.println("Problème" + ex.getMessage());
-        }
-
-        return categories;
-    }
-
-    public static ArrayList<Categoriegenerale> afficheallcats2(Connection con) throws Exception {
-        //affiche toutes les catégories générales
-        ArrayList<Categoriegenerale> categoriesgenerales = new ArrayList<>();
-        con.setAutoCommit(false);
-        try ( PreparedStatement searchcat = con.prepareStatement(
-                """
-         select * from categoriegenerale 
-                        
-                         order by categoriegenerale.nom asc
-        
-        """
-        )) {
-
-            ResultSet rs = searchcat.executeQuery();
-            System.out.println("Voici l'ensemble des catégories recherchées:");
-            while (rs.next()) {
-
-                System.out.println("Catégories générales"+" " + rs.getString("nom"));
-                Categoriegenerale categoriegenerale = new Categoriegenerale(rs.getInt("id"), rs.getString("nom"));
-                categoriesgenerales.add(categoriegenerale);
-
-//                for (int i = 0; i < categoriesgenerales.size(); i++) {
-//                    System.out.println(categoriesgenerales.get(i).toString());
-//                }
-            }
-
-        } catch (Exception ex) {
-
-            System.out.println("Problème" + ex.getMessage());
-        }
-        return categoriesgenerales;
-    }
-
-    public static void recreatebdd(Connection con) throws Exception {
-
-        try {
-            int u1 = createUtilisateur(con, "Naho", "Yezou",
-                    "naho@gmail.com", "bestmdpever", "67000");
-            int u2 = createUtilisateur(con, "Mariannie", "Alexandra",
-                    "alex@gmail.com", "admin", "67000");
-            int u3 = createUtilisateur(con, "Amon", "Priscilla",
-                    "prichou@gmail.com", "luna", "37000");
-            int u4 = createUtilisateur(con, "De Beuvron", "François",
-                    "beuvron@gmail.com", "prof", "67000");
-            int u5= createUtilisateur(con,"Billie","Eilish","flemme","u","68000");
-            int cg1 = createCategorieGenerale(con, "Meubles");
-            int cg2 = createCategorieGenerale(con, "Accessoires");
-            int cg3 = createCategorieGenerale(con, "Vehicules");
-            int c1 = createCategorie(con, "Lits", cg1);
-            int c2 = createCategorie(con, "Chaises", cg1);
-            int c3 = createCategorie(con, "Bijoux", cg2);
-            int c4 = createCategorie(con, "Sacs", cg2);
-            int c5 = createCategorie(con, "Voitures", cg3);
-            int c6 = createCategorie(con, "Vélos", cg3);
-
-            int o1 = createObjet(con, "Lit en hauteur", "lit pratique, rouge, bien pour les enfants",
-                    new Timestamp(System.currentTimeMillis()),
-                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 48000 * 1000),
-                    20, u1, cg1, c1);
-            int o2 = createObjet(con, "Chaise en cuir", "chaise pratique, noire, siège chauffant",
-                    new Timestamp(System.currentTimeMillis()),
-                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 48000 * 1000),
-                    150, u2, cg1, c2);
-            int o3 = createObjet(con, "Pendentif soleil", "or plaqué, très joli",
-                    new Timestamp(System.currentTimeMillis()),
-                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 24000 * 1000),
-                    35, u3, cg2, c3);
-            int o4 = createObjet(con, "sac à dos", "marque quechua, gris, contient beaucoup d'espace",
-                    new Timestamp(System.currentTimeMillis()),
-                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 48000 * 1000),
-                    20, u4, cg2, c4);
-            int o5 = createObjet(con, "Peugeot 306", "vieille voiture, jaune orangé, encore en excellent état, petit bolide",
-                    new Timestamp(System.currentTimeMillis()),
-                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 72000 * 1000),
-                    1500, u1, cg3, c5);
-            int o6 = createObjet(con, "bicyclette", "rose avec un panier à l'avant" + "/n" + "Elle appartenait à Marilyn Monroe ",
-                    new Timestamp(System.currentTimeMillis()),
-                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 72000 * 1000),
-                    20, u1, cg1, c1);
-            createEnchere(con, new Timestamp(System.currentTimeMillis()), 30, o1, u2);
-            createEnchere(con, new Timestamp(System.currentTimeMillis()), 160, o2, u3);
-            createEnchere(con, new Timestamp(System.currentTimeMillis()), 40, o3, u4);
-            createEnchere(con, new Timestamp(System.currentTimeMillis()), 21, o4, u1);
-            createEnchere(con, new Timestamp(System.currentTimeMillis()), 1600, o5, u2);
-            createEnchere(con, new Timestamp(System.currentTimeMillis()), 25, o6, u3);
-
-            System.out.println("Utilisateurs, Catégories, Objets et Enchères ajoutés avec succès");
-
-        } catch (Exception ex) {
-
-            System.out.println("Problème" + ex.getMessage());
-        }
-
-    }
-
-    public static void recreationbdd(Connection con) throws Exception {
-        //efface et recrée la bdd mais ne permet pas d'ajouter d'enchère, il faudra le faire manuellement
-        try {
-            deleteSchema(con);
-            creeSchema(con);
-            recreatebdd(con);
-        } catch (Exception ex) {
-            System.out.println("Problème" + ex.getMessage());
-        }
-    }
     
     public static String retrouveNomCatGen(Connection con, int catgen) throws Exception{
          try ( PreparedStatement Ps = con.prepareStatement(
@@ -1948,4 +1685,274 @@ System.out.println("Enchere numéro: "+" " + rs.getInt("id"));
             throw new Error(ex);
         }
 }
+    public static ArrayList<Enchere> afficheEnchere(Connection con, String nomobjet) throws Exception {
+//méthode qui affiche les infos de toutes les enchères faites sur un objet donné
+        ArrayList<Enchere> encheres = new ArrayList<>();
+        con.setAutoCommit(false);
+        
+        try(PreparedStatement searchobj = con.prepareStatement(
+        """
+        select id from objet where titre=?
+        """
+        )){
+            searchobj.setString(1,nomobjet);
+            ResultSet rs = searchobj.executeQuery();
+            if (rs.next()){
+                System.out.println("voici l'ensemble des encheres faites sur cet objet:");
+                
+            } else {
+                System.out.println("L'objet concerné n'existe pas");
+                throw new ObjetNexistePasException();
+            }
+            
+            
+        }
+        try ( PreparedStatement searchobjet = con.prepareStatement(
+                """
+         select enchere.id, quand, montant,de, sur
+                         from enchere join objet on enchere.sur = objet.id
+                         where objet.titre = ?
+                         order by quand asc
+        
+        """
+        )) {
+
+            searchobjet.setString(1, nomobjet);
+            ResultSet rs = searchobjet.executeQuery();
+            
+           boolean auMoins1=false;
+            while (rs.next()) {
+                auMoins1=true;
+               System.out.println("Enchere numéro: "+" " + rs.getInt("id"));
+                System.out.println("Faite le: " +" "+ rs.getTimestamp("quand"));
+                System.out.println("D'un montant de: " +" "+ rs.getInt("montant")+" " + "euros");
+                String user = retrouveNomUser(con, rs.getInt("de"));
+                System.out.println("Par l'utilisateur d'identifiant: "+" " + user);
+            }
+             if(!auMoins1) {
+                System.out.println("Pas encore d'enchères faites sur cet objet");
+                return null;
+            }
+
+        } catch (Exception ex) {
+            System.out.println("Problème" + ex.getMessage());
+        }
+
+        return encheres;
+    }
+
+    public static ArrayList<Enchere> afficheEncheresDeMesObjets(Connection con, String emailuser) throws Exception {
+//méthode qui affiche les infos de toutes les enchères faites sur tous les objets déposés par un user
+        ArrayList<Enchere> encheres = new ArrayList<>();
+        con.setAutoCommit(false);
+        try ( PreparedStatement searchobjet = con.prepareStatement(
+                """
+         select enchere.id,quand,montant,sur,de from enchere join objet 
+         on enchere.sur = objet.id where objet.proposepar = (select id from utilisateur where email = ?)
+                         order by quand asc
+        
+        """
+        )) {
+
+            searchobjet.setString(1, emailuser);
+            ResultSet rs = searchobjet.executeQuery();
+            
+            boolean auMoins1=false;
+            while (rs.next()) {
+                auMoins1=true;
+                String obj = retrouveNomObj(con, rs.getInt("sur"));
+                System.out.println("voici l'ensemble des encheres faites sur l'objet:"+" "+obj);
+                System.out.println("Enchère numéro"+" "+rs.getInt("id"));
+                System.out.println("Faite le: " +" "+ rs.getTimestamp("quand"));
+                System.out.println("D'un montant de: " +" "+ rs.getInt("montant")+" " + "euros");
+                String user = retrouveNomUser(con, rs.getInt("de"));
+                System.out.println("Par l'utilisateur : "+" " + user);
+
+            }
+             if(!auMoins1){ 
+                    System.out.println("Pas d'enchère faites sur vos objets");
+                    return null;
+                    }
+
+        } catch (Exception ex) {
+            System.out.println("Problème" + ex.getMessage());
+        }
+
+        return encheres;
+    }
+
+    public static boolean login(Connection con, String mail, String mdp) throws Exception { //choisir un utilisateur à partir de son nom et renvoyer ses infos
+
+        con.setAutoCommit(false);
+        try ( PreparedStatement searchuser = con.prepareStatement("select * from utilisateur where email=? and motdepasse = ?")) {
+
+            searchuser.setString(1, mail);
+            searchuser.setString(2, mdp);
+            ResultSet testNom = searchuser.executeQuery();
+
+           
+            if (testNom.next()) {
+                
+                    System.out.println("Login successful");
+                    return true;
+
+            }else {
+                return false;
+                }
+            
+
+        } catch (Exception ex) {
+            con.rollback();
+            System.out.println("Problème" + ex.getMessage());
+            throw new Error (ex);
+        }
+        
+    }
+
+    public static ArrayList<Categorie> afficheallcats1(Connection con, String nomcatgen) throws Exception {
+//afficher les sous catégories en entrant une catégorie générale
+        ArrayList<Categorie> categories = new ArrayList<>();
+        con.setAutoCommit(false);
+        try ( PreparedStatement searchcat = con.prepareStatement(
+                """
+         select categorie.nom, categorie.id, generale
+                         from categoriegenerale join categorie on categoriegenerale.id = categorie.generale
+                         where categoriegenerale.nom = ?
+                         order by categorie.nom asc
+        
+        """
+        )) {
+
+            searchcat.setString(1, nomcatgen);
+            ResultSet rs = searchcat.executeQuery();
+
+            System.out.println("Voici l'ensemble des sous-catégories recherchées:");
+            boolean auMoins1=false;
+            while (rs.next()) {
+                auMoins1=true;
+                System.out.println("" + rs.getString("nom"));
+                Categorie categorie = new Categorie(rs.getInt("id"), rs.getInt("generale"), rs.getString("nom"));
+                categories.add(categorie);
+//                for (int i = 0; i < categories.size(); i++) {
+//                    System.out.println(categories.get(i).toString());
+//                }
+
+            }
+             if(!auMoins1) { 
+                System.out.println("Aucune catégorie générale correspondate");
+                throw new CategorieGenNexistePasException();
+            }
+        } catch (Exception ex) {
+            System.out.println("Problème" + ex.getMessage());
+        }
+
+        return categories;
+    }
+
+    public static ArrayList<Categoriegenerale> afficheallcats2(Connection con) throws Exception {
+        //affiche toutes les catégories générales
+        ArrayList<Categoriegenerale> categoriesgenerales = new ArrayList<>();
+        con.setAutoCommit(false);
+        try ( PreparedStatement searchcat = con.prepareStatement(
+                """
+         select * from categoriegenerale 
+                        
+                         order by categoriegenerale.nom asc
+        
+        """
+        )) {
+
+            ResultSet rs = searchcat.executeQuery();
+            System.out.println("Voici l'ensemble des catégories recherchées:");
+            while (rs.next()) {
+
+                System.out.println("Catégories générales"+" " + rs.getString("nom"));
+                Categoriegenerale categoriegenerale = new Categoriegenerale(rs.getInt("id"), rs.getString("nom"));
+                categoriesgenerales.add(categoriegenerale);
+
+//                for (int i = 0; i < categoriesgenerales.size(); i++) {
+//                    System.out.println(categoriesgenerales.get(i).toString());
+//                }
+            }
+
+        } catch (Exception ex) {
+
+            System.out.println("Problème" + ex.getMessage());
+        }
+        return categoriesgenerales;
+    }
+
+    public static void recreatebdd(Connection con) throws Exception {
+
+        try {
+            int u1 = createUtilisateur(con, "Naho", "Yezou",
+                    "naho@gmail.com", "bestmdpever", "67000");
+            int u2 = createUtilisateur(con, "Mariannie", "Alexandra",
+                    "alex@gmail.com", "admin", "67000");
+            int u3 = createUtilisateur(con, "Amon", "Priscilla",
+                    "prichou@gmail.com", "luna", "37000");
+            int u4 = createUtilisateur(con, "De Beuvron", "François",
+                    "beuvron@gmail.com", "prof", "67000");
+            int u5= createUtilisateur(con,"Billie","Eilish","flemme","u","68000");
+            int cg1 = createCategorieGenerale(con, "Meubles");
+            int cg2 = createCategorieGenerale(con, "Accessoires");
+            int cg3 = createCategorieGenerale(con, "Vehicules");
+            int c1 = createCategorie(con, "Lits", cg1);
+            int c2 = createCategorie(con, "Chaises", cg1);
+            int c3 = createCategorie(con, "Bijoux", cg2);
+            int c4 = createCategorie(con, "Sacs", cg2);
+            int c5 = createCategorie(con, "Voitures", cg3);
+            int c6 = createCategorie(con, "Vélos", cg3);
+
+            int o1 = createObjet(con, "Lit en hauteur", "lit pratique, rouge, bien pour les enfants",
+                    new Timestamp(System.currentTimeMillis()),
+                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 48000 * 1000),
+                    20, u1, cg1, c1);
+            int o2 = createObjet(con, "Chaise en cuir", "chaise pratique, noire, siège chauffant",
+                    new Timestamp(System.currentTimeMillis()),
+                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 48000 * 1000),
+                    150, u2, cg1, c2);
+            int o3 = createObjet(con, "Pendentif soleil", "or plaqué, très joli",
+                    new Timestamp(System.currentTimeMillis()),
+                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 24000 * 1000),
+                    35, u3, cg2, c3);
+            int o4 = createObjet(con, "sac à dos", "marque quechua, gris, contient beaucoup d'espace",
+                    new Timestamp(System.currentTimeMillis()),
+                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 48000 * 1000),
+                    20, u4, cg2, c4);
+            int o5 = createObjet(con, "Peugeot 306", "vieille voiture, jaune orangé, encore en excellent état, petit bolide",
+                    new Timestamp(System.currentTimeMillis()),
+                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 72000 * 1000),
+                    1500, u1, cg3, c5);
+            int o6 = createObjet(con, "bicyclette", "rose avec un panier à l'avant" + "/n" + "Elle appartenait à Marilyn Monroe ",
+                    new Timestamp(System.currentTimeMillis()),
+                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 72000 * 1000),
+                    20, u1, cg1, c1);
+            createEnchere(con, new Timestamp(System.currentTimeMillis()), 30, o1, u2);
+            createEnchere(con, new Timestamp(System.currentTimeMillis()), 160, o2, u3);
+            createEnchere(con, new Timestamp(System.currentTimeMillis()), 40, o3, u4);
+            createEnchere(con, new Timestamp(System.currentTimeMillis()), 21, o4, u1);
+            createEnchere(con, new Timestamp(System.currentTimeMillis()), 1600, o5, u2);
+            createEnchere(con, new Timestamp(System.currentTimeMillis()), 25, o6, u3);
+
+            System.out.println("Utilisateurs, Catégories, Objets et Enchères ajoutés avec succès");
+
+        } catch (Exception ex) {
+
+            System.out.println("Problème" + ex.getMessage());
+        }
+
+    }
+
+    public static void recreationbdd(Connection con) throws Exception {
+        //efface et recrée la bdd mais ne permet pas d'ajouter d'enchère, il faudra le faire manuellement
+        try {
+            deleteSchema(con);
+            creeSchema(con);
+            recreatebdd(con);
+        } catch (Exception ex) {
+            System.out.println("Problème" + ex.getMessage());
+        }
+    }
+
 }
