@@ -38,7 +38,9 @@ public class MainAppinterface {
             System.out.println("connection réussie"); //si la connection est établie ca te l'affiche, si tu n'as rien c'est que non
             //afficheEnchere(con,"bicyclette");
             //mesObjetsVoulus(con,"naho@gmail.com");
-            MenuTexte(con); //Toutes mes méthodes prennent au minimun une connection en entrée. Cette connection c'est celle qui t'aura été fournie après le défaut connect. Ca veut dire que toutes les méthodes dont tu te serviras auront forcément un impact sur la bdd 
+            String nom=GestionBDinterface.retrouveNomCatFromObj(con, 2);
+            System.out.println(nom);
+            //MenuTexte(con); //Toutes mes méthodes prennent au minimun une connection en entrée. Cette connection c'est celle qui t'aura été fournie après le défaut connect. Ca veut dire que toutes les méthodes dont tu te serviras auront forcément un impact sur la bdd 
         } catch (Exception ex) {
             throw new Error(ex);
         }

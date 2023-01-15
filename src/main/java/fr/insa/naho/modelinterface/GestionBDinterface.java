@@ -363,21 +363,21 @@ public class GestionBDinterface {
      public static class CategorieGenExisteDejaException extends Exception {
     }
 
-    public static boolean demandeUtilisateur(Connection con, String nom, String prenom, String email, String motdepasse, String codepostal) throws Exception {
+    public static void demandeUtilisateur(Connection con, String nom, String prenom, String email, String motdepasse, String codepostal) throws Exception {
         boolean existe = true;
         while (existe) {
 
             try {
                 createUtilisateur(con, nom, prenom, email, motdepasse, codepostal);
-                existe = false;
+                
 
             } catch (Exception ex) {
                 System.out.println("Problème" + ex.getMessage());
                 
-                return false;
+                
             }
         }
-        return true;
+       
     }
 
     public static void trouveUtilisateurMail(Connection con, String mail) throws SQLException, UtilisateurNexistePasException { //choisir un utilisateur à partir de son nom et renvoyer ses infos
@@ -954,9 +954,10 @@ public class GestionBDinterface {
 
             searchobjet.setString(1, nom); //on indique ici que le premier point ? référence le nom
             ResultSet rs = searchobjet.executeQuery();
-            if(rs.next()){
+            
+                boolean auMoins1=false;
             while (rs.next()) {
-
+                auMoins1=true;
                 System.out.println("voici les infos pour l'objet d'identifiant :" + " " + rs.getInt("id"));
                 System.out.println("titre: " + " " + rs.getString("titre"));
                 System.out.println("description: " + " " + rs.getString("description"));
@@ -981,7 +982,7 @@ public class GestionBDinterface {
                 System.out.println("Le montant de l'enchère maximale est de :" + " " + maxi + " " + "euros");
 
             }
-            } else {
+            if(!auMoins1){
                 System.out.println("Pas d'objets correspondants.");
                 return null;
                 
@@ -1624,7 +1625,9 @@ public class GestionBDinterface {
             ResultSet rs = Ps.executeQuery();
 
             if (rs.next()) {
+                 //System.out.println(rs.getString("nom"));
                 return rs.getString("nom");
+               
 
             } else {
 
