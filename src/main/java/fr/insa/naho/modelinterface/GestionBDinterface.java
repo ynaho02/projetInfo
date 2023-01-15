@@ -310,8 +310,6 @@ public class GestionBDinterface {
 
     public static int createUtilisateur(Connection con, String nom, String prenom, String email, String mdp, String codepostal)
             throws SQLException, EmailExisteDejaException {
-        // je me place dans une transaction pour m'assurer que la séquence
-        // test du nom - création est bien atomique et isolée
         con.setAutoCommit(false);
         try ( PreparedStatement chercheEmail = con.prepareStatement(
                 "select id from utilisateur where email = ?")) { //seul le mail doit etre unique pour notre bdd
@@ -364,8 +362,7 @@ public class GestionBDinterface {
     }
 
     public static void demandeUtilisateur(Connection con, String nom, String prenom, String email, String motdepasse, String codepostal) throws Exception {
-        boolean existe = true;
-        while (existe) {
+        
 
             try {
                 createUtilisateur(con, nom, prenom, email, motdepasse, codepostal);
@@ -376,7 +373,7 @@ public class GestionBDinterface {
                 
                 
             }
-        }
+        
        
     }
 
@@ -812,8 +809,7 @@ public class GestionBDinterface {
             String nomcat, String emailuser) 
             throws Exception {
         ArrayList<Objet> objets = new ArrayList<>();
-        boolean existe = true;
-       while (existe) {
+        
 
             Timestamp debut = new Timestamp(System.currentTimeMillis());
             Timestamp fin = Timestamp.valueOf(Fin); 
@@ -881,35 +877,32 @@ public class GestionBDinterface {
 
             try {
                 createObjet(con, titre, description, debut, fin, prixbase, proposepar, categoriegenerale, categorie);
-                existe = false;
+                
                 System.out.println("Objet ajouté avec succès.");
             } catch (Exception ex) {
                 System.out.println("Problème" + ex.getMessage());
 //                throw new Error(ex);
 
             }
-       }
+       
         
 
     }
 
     public static void demandeCategorieGenerale(Connection con, String nomcat) throws SQLException, CategorieGenExisteDejaException { //entrer manuellement de nouvelles categories
-        boolean existe = true;
-        while (existe) {
+       
 
             try {
                 createCategorieGenerale(con, nomcat);
-                existe = false;
+                
             } catch (Exception ex) {
                 System.out.println("Problème:" + ex.getMessage());
             }
-        }
+        
     }
 
     public static void demandeCategorie(Connection con, String nomcat, String nomcatgen) throws SQLException, CategorieExisteDejaException { //entrer manuellement de nouvelles categories
-        boolean existe = true;
-        while (existe) {
-
+       
             int generale = -1;
 
             try ( PreparedStatement chercheCat = con.prepareStatement( //ici on récupère l'id de la cat correspondante
@@ -931,11 +924,11 @@ public class GestionBDinterface {
 
             try {
                 createCategorie(con, nomcat, generale);
-                existe = false;
+               
             } catch (Exception ex) {
                 System.out.println("Problème:" + ex.getMessage());
             }
-        }
+        
     }
 
     public static ArrayList<Objet> trouveObjetCatGen(Connection con, String nom) throws Exception {
