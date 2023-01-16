@@ -21,8 +21,9 @@ public class Objet {
     private int categoriegenerale;
     private int categorie;
     private int max;
+    private int montant;
     
-    public Objet(int id,String titre, String description, Timestamp debut, Timestamp fin, int prixbase, int proposepar, int categoriegenerale, int categorie, int max){
+    public Objet(int id,String titre, String description, Timestamp debut, Timestamp fin, int prixbase, int proposepar, int categoriegenerale, int categorie, int max,int montant){
         
        this.id=id;
        this.titre=titre;
@@ -34,6 +35,7 @@ public class Objet {
        this.categoriegenerale=categoriegenerale;
        this.categorie=categorie;
        this.max=max;
+       this.montant=montant;
        
     }
 
@@ -79,7 +81,9 @@ public class Objet {
     public int getMax() {
         return max;
     }
-    
+     public int getMontant() {
+        return montant;
+    }
     @Override
     public String toString(){
        return "Objet numéro: "+" "+this.id +"\n"+ "titre:"+ " " +this.titre+"\n"+
@@ -88,7 +92,8 @@ public class Objet {
                "proposé par l'utilisateur d'identifiant:"+ " " +this.proposepar+ "\n"+
                "appartenant à la catégorie générale numéro:"+ " "+this.categoriegenerale+ "\n"+
                "et à la catégorie:"+ " "+this.categorie+"\n"+
-               "Enhere maximale:"+" "+this.max ;
+               "Enhere maximale:"+" "+this.max+"\n"+
+               "Votre enchère était de:"+" "+this.montant;
     
 }
 }

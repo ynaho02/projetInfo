@@ -37,7 +37,7 @@ public class MainAppinterface {
         try ( Connection con = defautConnect()) { //defautconnect renvoie une connection. Une fois que cette méthode est appelé ton sgbd est actif et tu peux accéder a la database depuis java
 
             System.out.println("connection réussie"); //si la connection est établie ca te l'affiche, si tu n'as rien c'est que non
-         
+           
             MenuTexte(con); //Toutes mes méthodes prennent au minimun une connection en entrée. Cette connection c'est celle qui t'aura été fournie après le défaut connect. Ca veut dire que toutes les méthodes dont tu te serviras auront forcément un impact sur la bdd 
         } catch (Exception ex) {
             throw new Error(ex);
