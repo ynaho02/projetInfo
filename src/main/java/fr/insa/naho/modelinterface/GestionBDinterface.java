@@ -354,7 +354,8 @@ public class GestionBDinterface {
 
     public static class EmailExisteDejaException extends Exception {
     }
-
+    public static class EnchereImpossibleException extends Exception {
+    }
     public static class CategorieExisteDejaException extends Exception {
     }
     
@@ -702,7 +703,18 @@ public class GestionBDinterface {
             ResultSet testUser = chercheUser.executeQuery();
 
             if (testUser.next()) {
-                de = testUser.getInt("id");
+                
+                int etsi = testUser.getInt("id");
+                String Etsi=retrouveNomUser(con, etsi);
+                
+                      if(Etsi.equals(emailuser)){
+                          System.out.println("Haha vous ne pouvez pas enchérir sur un de vos objets.");
+                          de=0;
+                          throw new EnchereImpossibleException();
+                      } else{
+                          de=etsi;
+                      }
+                        
 
             } else {
                 System.out.println(" L'utilisateur susmentionné n'existe pas dans notre répertoire.");
@@ -1681,6 +1693,8 @@ public class GestionBDinterface {
             throw new Error(ex);
         }
 }
+    
+
     public static ArrayList<Enchere> afficheEnchere(Connection con, String nomobjet) throws Exception {
 //méthode qui affiche les infos de toutes les enchères faites sur un objet donné
         ArrayList<Enchere> encheres = new ArrayList<>();
