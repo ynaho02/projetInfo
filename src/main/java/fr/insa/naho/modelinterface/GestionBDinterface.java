@@ -456,11 +456,7 @@ public class GestionBDinterface {
                 System.out.println("date de fin de la mise en enchere: " + " " + rs.getTimestamp("fin"));
                 System.out.println("le prix de base était de: " + " " + rs.getInt("prixbase") + "euros");
 
-                Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("description"), rs.getTimestamp("debut"),
-                        rs.getTimestamp("fin"), rs.getInt("prixbase"), rs.getInt("proposepar"), rs.getInt("categoriegenerale"),
-                        rs.getInt("categorie"));
-
-                objets.add(objet);
+             
 
                 String user = retrouveNomUser(con, rs.getInt("proposepar"));
                 System.out.println("Objet proposé par:" + " " + user);
@@ -471,8 +467,15 @@ public class GestionBDinterface {
                 String cat = retrouveNomCatFromObj(con, rs.getInt("categorie"));
                 System.out.println("Catégorie générale:" + " " + cat);
 
-                int maxi = getMax(con, objet);
+                int maxi = getMax(con, rs.getString("titre"));
                 System.out.println("Le montant de l'enchère maximale est de :" + " " + maxi + " " + "euros");
+                
+                 Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("description"), rs.getTimestamp("debut"),
+                        rs.getTimestamp("fin"), rs.getInt("prixbase"), rs.getInt("proposepar"), rs.getInt("categoriegenerale"),
+                        rs.getInt("categorie"),maxi);
+
+                objets.add(objet);
+                
             }
         } catch (Exception ex) {
 
@@ -580,7 +583,7 @@ public class GestionBDinterface {
     public static int createObjet(Connection con, String titre, String description, Timestamp debut, Timestamp fin, int prixbase, int proposepar, int categoriegenerale, int categorie)
             throws SQLException, CategorieNexistePasException, CategorieGenNexistePasException, UtilisateurNexistePasException {
 //C'est pareil, c'est la première partie du processsus permettant d'ajouter un objet
-        ArrayList<Objet> Objets = new ArrayList<>();
+        
         con.setAutoCommit(false);
 
         try ( PreparedStatement pst = con.prepareStatement(
@@ -605,9 +608,7 @@ public class GestionBDinterface {
                 rid.next();
 
                 int id = rid.getInt(1);
-                Objet obj = new Objet(id, titre, description, debut, fin, prixbase, proposepar, categoriegenerale, categorie);
-                Objets.add(obj);
-
+               
                 return id;
 
             }
@@ -679,9 +680,9 @@ public class GestionBDinterface {
         Timestamp quand = new Timestamp(System.currentTimeMillis());
 
         try ( PreparedStatement chercheObj = con.prepareStatement( //on vérifie que l'objet sur lequel on veut faire l'enchere est bien dans la bdd
-                "select id from objet where titre = ?")) {
+                "select id from objet where titre ILIKE ?")) {
 
-            chercheObj.setString(1, titreobj);
+            chercheObj.setString(1, "%" + titreobj + "%");
             ResultSet testObj = chercheObj.executeQuery();
 
             if (testObj.next()) {
@@ -954,11 +955,7 @@ public class GestionBDinterface {
                 System.out.println("date de mise en enchere: " + " " + rs.getTimestamp("debut"));
                 System.out.println("date de fin de la mise en enchere: " + " " + rs.getTimestamp("fin"));
                 System.out.println("le prix de base est de: " + " " + rs.getInt("prixbase") + "euros");
-                Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("description"), rs.getTimestamp("debut"),
-                        rs.getTimestamp("fin"), rs.getInt("prixbase"), rs.getInt("proposepar"), rs.getInt("categoriegenerale"),
-                        rs.getInt("categorie"));
-
-                objets.add(objet);
+                
                 String user = retrouveNomUser(con, rs.getInt("proposepar"));
                 System.out.println("Objet proposé par:" + " " + user);
 
@@ -968,8 +965,13 @@ public class GestionBDinterface {
                 String cat = retrouveNomCatFromObj(con, rs.getInt("categorie"));
                 System.out.println("Sous-catégorie:" + " " + cat);
 
-                int maxi = getMax(con, objet);
+                int maxi = getMax(con, rs.getString("titre"));
                 System.out.println("Le montant de l'enchère maximale est de :" + " " + maxi + " " + "euros");
+                Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("description"), rs.getTimestamp("debut"),
+                        rs.getTimestamp("fin"), rs.getInt("prixbase"), rs.getInt("proposepar"), rs.getInt("categoriegenerale"),
+                        rs.getInt("categorie"),maxi);
+
+                objets.add(objet);
 
             }
             if (!auMoins1) {
@@ -986,7 +988,7 @@ public class GestionBDinterface {
         return objets;
     }
 
-    public static int getMax(Connection con, Objet obj) throws Exception {
+    public static int getMax(Connection con, String titreobj) throws Exception {
         //cette méthode prend en paramètre d'entrée un objet et te retrouve et te renvoie le montant de l'enchere maximale faite sur lui
         try ( PreparedStatement searchobjet1 = con.prepareStatement(
                 """
@@ -995,7 +997,7 @@ public class GestionBDinterface {
         
         """)) {
 
-            searchobjet1.setString(1, obj.getTitre());
+            searchobjet1.setString(1, titreobj);
             ResultSet rs1 = searchobjet1.executeQuery();
 
             if (rs1.next()) {
@@ -1039,12 +1041,6 @@ public class GestionBDinterface {
                 System.out.println("date de fin de la mise en enchere: " + " " + rs.getTimestamp("fin"));
                 System.out.println("le prix de base était de: " + " " + rs.getInt("prixbase") + "euros");
 
-                Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("description"), rs.getTimestamp("debut"),
-                        rs.getTimestamp("fin"), rs.getInt("prixbase"), rs.getInt("proposepar"), rs.getInt("categoriegenerale"),
-                        rs.getInt("categorie"));
-
-                objets.add(objet);
-
                 String user = retrouveNomUser(con, rs.getInt("proposepar"));
                 System.out.println("Objet proposé par:" + " " + user);
 
@@ -1054,8 +1050,14 @@ public class GestionBDinterface {
                 String cat = retrouveNomCatFromObj(con, rs.getInt("categorie"));
                 System.out.println("Sous-catégorie:" + " " + cat);
 
-                int maxi = getMax(con, objet);
+                int maxi = getMax(con, rs.getString("titre"));
                 System.out.println("Le montant de l'enchère maximale est de :" + " " + maxi + " " + "euros");
+                
+                Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("description"), rs.getTimestamp("debut"),
+                        rs.getTimestamp("fin"), rs.getInt("prixbase"), rs.getInt("proposepar"), rs.getInt("categoriegenerale"),
+                        rs.getInt("categorie"),maxi);
+
+                objets.add(objet);
             }
 
             if (!auMoins1) {
@@ -1093,10 +1095,7 @@ public class GestionBDinterface {
                 System.out.println("date de fin de la mise en enchere: " + " " + rs.getTimestamp("fin"));
                 System.out.println("le prix de base est de: " + " " + rs.getInt("prixbase") + " " + "euros");
 
-                Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("description"), rs.getTimestamp("debut"),
-                        rs.getTimestamp("fin"), rs.getInt("prixbase"), rs.getInt("proposepar"), rs.getInt("categoriegenerale"),
-                        rs.getInt("categorie"));
-                objets.add(objet);
+               
 
                 String user = retrouveNomUser(con, rs.getInt("proposepar"));
                 System.out.println("Objet proposé par:" + " " + user);
@@ -1107,9 +1106,13 @@ public class GestionBDinterface {
                 String cat = retrouveNomCatFromObj(con, rs.getInt("categorie"));
                 System.out.println("Sous-catégorie:" + " " + cat);
 
-                int maxi = getMax(con, objet);
+                int maxi = getMax(con, rs.getString("titre"));
 
                 System.out.println("Le montant de l'enchère maximale est de :" + " " + maxi + " " + "euros");
+                 Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("description"), rs.getTimestamp("debut"),
+                        rs.getTimestamp("fin"), rs.getInt("prixbase"), rs.getInt("proposepar"), rs.getInt("categoriegenerale"),
+                        rs.getInt("categorie"),maxi);
+                objets.add(objet);
 
             }
             if (!auMoins1) {
@@ -1146,10 +1149,7 @@ public class GestionBDinterface {
                 System.out.println("date de fin de la mise en enchere: " + " " + rs.getTimestamp("fin"));
                 System.out.println("le prix de base est de: " + " " + rs.getInt("prixbase") + " " + "euros");
 
-                Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("description"), rs.getTimestamp("debut"),
-                        rs.getTimestamp("fin"), rs.getInt("prixbase"), rs.getInt("proposepar"), rs.getInt("categoriegenerale"),
-                        rs.getInt("categorie"));
-
+               
                 String user = retrouveNomUser(con, rs.getInt("proposepar"));
                 System.out.println("Objet proposé par:" + " " + user);
 
@@ -1159,9 +1159,14 @@ public class GestionBDinterface {
                 String cat = retrouveNomCatFromObj(con, rs.getInt("categorie"));
                 System.out.println("Sous-catégorie:" + " " + cat);
 
-                int maxi = getMax(con, objet);
+                int maxi = getMax(con, rs.getString("titre"));
                 System.out.println("Le montant de l'enchère maximale est de :" + " " + maxi + " " + "euros");
+                
+                 Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("description"), rs.getTimestamp("debut"),
+                        rs.getTimestamp("fin"), rs.getInt("prixbase"), rs.getInt("proposepar"), rs.getInt("categoriegenerale"),
+                        rs.getInt("categorie"),maxi);
                 objets.add(objet);
+                
             }
             if (!auMoinsUn) {
                 System.out.println("Aucun objet trouvé.");
@@ -1200,11 +1205,6 @@ public class GestionBDinterface {
                 System.out.println("date de fin de la mise en enchere: " + " " + rs.getTimestamp("fin"));
                 System.out.println("le prix de base est de: " + " " + rs.getInt("prixbase") + " " + "euros");
 
-                Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("description"), rs.getTimestamp("debut"),
-                        rs.getTimestamp("fin"), rs.getInt("prixbase"), rs.getInt("proposepar"), rs.getInt("categoriegenerale"),
-                        rs.getInt("categorie"));
-
-                objets.add(objet);
                 String user = retrouveNomUser(con, rs.getInt("proposepar"));
                 System.out.println("Objet proposé par:" + " " + user);
 
@@ -1214,8 +1214,14 @@ public class GestionBDinterface {
                 String cat = retrouveNomCatFromObj(con, rs.getInt("categorie"));
                 System.out.println("Sous-catégorie:" + " " + cat);
 
-                int maxi = getMax(con, objet);
+                int maxi = getMax(con, rs.getString("titre"));
                 System.out.println("Le montant de l'enchère maximale est de :" + " " + maxi + " " + "euros");
+                 Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("description"), rs.getTimestamp("debut"),
+                        rs.getTimestamp("fin"), rs.getInt("prixbase"), rs.getInt("proposepar"), rs.getInt("categoriegenerale"),
+                        rs.getInt("categorie"),maxi);
+
+                objets.add(objet);
+                
             }
             if (!auMoins1) {
                 System.out.println("Aucun objet trouvé.");
@@ -1259,10 +1265,6 @@ public class GestionBDinterface {
                 System.out.println("date de fin de la mise en enchere: " + " " + rs.getTimestamp("fin"));
                 System.out.println("le prix de base est de: " + " " + rs.getInt("prixbase") + " " + "euros");
 
-                Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("description"), rs.getTimestamp("debut"),
-                        rs.getTimestamp("fin"), rs.getInt("prixbase"), rs.getInt("proposepar"), rs.getInt("categoriegenerale"),
-                        rs.getInt("categorie"));
-                objets.add(objet);
 
                 String user = retrouveNomUser(con, rs.getInt("proposepar"));
                 System.out.println("Objet proposé par:" + " " + user);
@@ -1273,9 +1275,14 @@ public class GestionBDinterface {
                 String cat = retrouveNomCatFromObj(con, rs.getInt("categorie"));
                 System.out.println("Sous-catégorie:" + " " + cat);
 
-                int maxi = getMax(con, objet);
+                int maxi = getMax(con, rs.getString("titre"));
+                 System.out.println("Le montant de l'enchère maximale est de :" + " " + maxi + " " + "euros");
+                 Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("description"), rs.getTimestamp("debut"),
+                        rs.getTimestamp("fin"), rs.getInt("prixbase"), rs.getInt("proposepar"), rs.getInt("categoriegenerale"),
+                        rs.getInt("categorie"),maxi);
+                objets.add(objet);
 
-                System.out.println("Le montant de l'enchère maximale est de :" + " " + maxi + " " + "euros");
+            
 
 //                    Objet objet = new Objet(testNom.getInt("id"), testNom.getString("titre"), testNom.getString("description"), testNom.getTimestamp("debut"),
 //                            testNom.getTimestamp("fin"), testNom.getInt("prixbase"), testNom.getInt("proposepar"), testNom.getInt("categoriegenerale"),
@@ -1332,10 +1339,6 @@ public class GestionBDinterface {
                 System.out.println("date de fin de la mise en enchere: " + " " + rs.getTimestamp("fin"));
                 System.out.println("le prix de base est de: " + " " + rs.getInt("prixbase") + " " + "euros");
 
-                Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("description"), rs.getTimestamp("debut"),
-                        rs.getTimestamp("fin"), rs.getInt("prixbase"), rs.getInt("proposepar"), rs.getInt("categoriegenerale"),
-                        rs.getInt("categorie"));
-                objets.add(objet);
 
                 String user = retrouveNomUser(con, rs.getInt("proposepar"));
                 System.out.println("Objet proposé par:" + " " + user);
@@ -1346,10 +1349,13 @@ public class GestionBDinterface {
                 String cat = retrouveNomCatFromObj(con, rs.getInt("categorie"));
                 System.out.println("Sous-catégorie:" + " " + cat);
 
-                int maxi = getMax(con, objet);
+                int maxi = getMax(con, rs.getString("titre"));
 
                 System.out.println("Le montant de l'enchère maximale est de :" + " " + maxi + " " + "euros");
-
+Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("description"), rs.getTimestamp("debut"),
+                        rs.getTimestamp("fin"), rs.getInt("prixbase"), rs.getInt("proposepar"), rs.getInt("categoriegenerale"),
+                        rs.getInt("categorie"),maxi);
+                objets.add(objet);
 //                   
 //                    Objet objet = new Objet(testNom.getInt("id"), testNom.getString("titre"), testNom.getString("description"), testNom.getTimestamp("debut"),
 //                            testNom.getTimestamp("fin"), testNom.getInt("prixbase"), testNom.getInt("proposepar"), testNom.getInt("categoriegenerale"),
