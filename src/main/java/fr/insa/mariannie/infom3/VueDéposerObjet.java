@@ -134,7 +134,7 @@ public class VueDéposerObjet extends GridPane {
         this.add(this.Description, 0, 2);
         this.add(this.tfdescription, 1, 2);
 
-        this.annee = new Label("Date de fin d'enchère:Année");
+        this.annee = new Label("Date de fin d'enchère: Année");
         this.tfannee = new TextField();
         this.add(this.annee, 0, 3);
         this.add(this.tfannee, 1, 3);
@@ -164,7 +164,7 @@ public class VueDéposerObjet extends GridPane {
         this.add(this.cbcategorie, 1, 7);
 
         this.image = new Button("Associer image");
-        this.add(this.image, 0, 8);
+       // this.add(this.image, 0, 8);
 
 //          image.setOnAction((t) -> {
 //               
@@ -200,7 +200,7 @@ public class VueDéposerObjet extends GridPane {
                 this.images = GestionBDinterface.insererImage(this.main.getCon());
                 GestionBDinterface.demandeObjet(this.main.getCon(), this.tftitre.getText(), this.tfdescription.getText(),
                         valueprix, valueannee, valuemois, valuedate, this.fin,
-                        "Bananes", this.cbcategorie.getValue().toString(), this.main.getCurUserMail(), this.images);
+                        "Puit", this.cbcategorie.getValue().toString(), this.main.getCurUserMail(), this.images);
 
 //                 GestionBDinterface.demandeObjet(this.main.getCon(), this.tftitre.getText(),this.tfdescription.getText(), 
 //                 valueprix,valueannee, valuemois,valuedate, this.fin,

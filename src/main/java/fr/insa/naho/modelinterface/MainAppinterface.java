@@ -14,6 +14,7 @@ import static fr.insa.naho.modelinterface.GestionBDinterface.createCategorieGene
 import static fr.insa.naho.modelinterface.GestionBDinterface.createUtilisateur;
 import static fr.insa.naho.modelinterface.GestionBDinterface.defautConnect;
 import static fr.insa.naho.modelinterface.GestionBDinterface.demandeCategorie;
+import static fr.insa.naho.modelinterface.GestionBDinterface.demandeDelete;
 import static fr.insa.naho.modelinterface.GestionBDinterface.demandeUpdateFin;
 import static fr.insa.naho.modelinterface.GestionBDinterface.login;
 import static fr.insa.naho.modelinterface.GestionBDinterface.mesObjets;
@@ -42,9 +43,10 @@ public class MainAppinterface {
 
             System.out.println("connection réussie"); //si la connection est établie ca te l'affiche, si tu n'as rien c'est que non
             //GestionBDinterface.insererImage(con);
-
-recreatebdd(con);
-            //MenuTexte(con); //Toutes mes méthodes prennent au minimun une connection en entrée. Cette connection c'est celle qui t'aura été fournie après le défaut connect. Ca veut dire que toutes les méthodes dont tu te serviras auront forcément un impact sur la bdd 
+            System.out.println("entre titre");
+           
+//recreatebdd(con);
+            MenuTexte(con); //Toutes mes méthodes prennent au minimun une connection en entrée. Cette connection c'est celle qui t'aura été fournie après le défaut connect. Ca veut dire que toutes les méthodes dont tu te serviras auront forcément un impact sur la bdd 
         } catch (Exception ex) {
             throw new Error(ex);
         }

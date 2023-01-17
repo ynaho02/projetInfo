@@ -16,12 +16,12 @@ public class Main {
     public static void main(String[] args) {
         try ( Connection con = defautConnect()) {
             System.out.println("connection reussie!");
-            // GestionBdD.deleteSchema(con);
-            //System.out.println("schema supprimé");
-          // GestionBdD.creeSchema(con);
-          //  System.out.println("schéma créé");
-           //GestionBdD.createNvObjet(con);
-           // GestionBdD.afficheTousLesUtilisateur(con);
+             GestionBdD.deleteSchema(con);
+            System.out.println("schema supprimé");
+           GestionBdD.creeSchema(con);
+            System.out.println("schéma créé");
+           GestionBdD.createNvObjet(con);
+            GestionBdD.afficheTousLesUtilisateur(con);
         } catch (Exception ex) {
             throw new Error(ex);
         }

@@ -188,6 +188,30 @@ public class GestionBDinterface {
 
     }
 
+     public static void delete(Connection con, String titre) throws SQLException {
+           try ( PreparedStatement pst = con.prepareStatement(
+                    """
+               delete from objet where titre = ?
+                """)) {
+                
+                pst.setString(1, titre);
+
+                pst.executeUpdate();
+                
+
+            }
+     }
+     
+      public static void demandeDelete(Connection con, String titre) throws SQLException, UtilisateurNexistePasException {
+
+        try {
+            delete(con,titre);
+
+        } catch (Exception ex) {
+            System.out.println("" + ex.getMessage());
+        }
+
+    }
     public static void deleteSchema(Connection con) throws SQLException {
         try ( Statement st = con.createStatement()) {
 
@@ -1889,9 +1913,9 @@ Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("de
             int u4 = createUtilisateur(con, "De Beuvron", "François",
                     "beuvron@gmail.com", "prof", "67000");
             int u5 = createUtilisateur(con, "Billie", "Eilish", "flemme", "u", "68000");
-            int cg1 = createCategorieGenerale(con, "Meubles");
-            int cg2 = createCategorieGenerale(con, "Accessoires");
-            int cg3 = createCategorieGenerale(con, "Vehicules");
+            int cg1 = createCategorieGenerale(con, "Bananes");
+//            int cg2 = createCategorieGenerale(con, "Accessoires");
+//            int cg3 = createCategorieGenerale(con, "Vehicules");
 //            int c1 = createCategorie(con, "Lits", cg1);
 //            int c2 = createCategorie(con, "Chaises", cg1);
 //            int c3 = createCategorie(con, "Bijoux", cg2);
@@ -1930,7 +1954,7 @@ Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("de
 //            createEnchere(con, new Timestamp(System.currentTimeMillis()), 1600, o5, u2);
 //            createEnchere(con, new Timestamp(System.currentTimeMillis()), 25, o6, u3);
 
-            System.out.println("Utilisateurs, Catégories, Objets et Enchères ajoutés avec succès");
+            System.out.println("Utilisateurs, Catégories ajoutés avec succès");
 
         } catch (Exception ex) {
 
@@ -1970,7 +1994,7 @@ Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("de
         try {
             deleteSchema(con);
             creeSchema(con);
-            //recreatebdd(con);
+            recreatebdd(con);
         } catch (Exception ex) {
             System.out.println("Problème" + ex.getMessage());
         }

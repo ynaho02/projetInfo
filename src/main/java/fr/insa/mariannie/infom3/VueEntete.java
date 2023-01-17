@@ -188,27 +188,27 @@ public class VueEntete extends HBox {
        
        String c17="Matériel Agricole";
        String c18="BTP";
-////      int cg1= GestionBDinterface.createCategorieGenerale(this.main.getCon(), "Bananes");
-//////       
-////       GestionBDinterface.createCategorie(this.main.getCon(), c18, cg1);
-////       GestionBDinterface.createCategorie(this.main.getCon(), c17, cg1);
-////       GestionBDinterface.createCategorie(this.main.getCon(), c16, cg1);        
-////       GestionBDinterface.createCategorie(this.main.getCon(), c15, cg1);        
-////GestionBDinterface.createCategorie(this.main.getCon(), c14, cg1);
-////       GestionBDinterface.createCategorie(this.main.getCon(), c13, cg1);
-////       GestionBDinterface.createCategorie(this.main.getCon(), c12, cg1);
-////       GestionBDinterface.createCategorie(this.main.getCon(), c11, cg1);
-////       GestionBDinterface.createCategorie(this.main.getCon(), c10, cg1);
-////       GestionBDinterface.createCategorie(this.main.getCon(), c9, cg1);
-////       GestionBDinterface.createCategorie(this.main.getCon(), c8, cg1);
-////       GestionBDinterface.createCategorie(this.main.getCon(), c7, cg1);
-////       GestionBDinterface.createCategorie(this.main.getCon(), c6, cg1);
-////       GestionBDinterface.createCategorie(this.main.getCon(), c5, cg1);
-////       GestionBDinterface.createCategorie(this.main.getCon(), c4, cg1);
-////       GestionBDinterface.createCategorie(this.main.getCon(), c3, cg1);
-////       GestionBDinterface.createCategorie(this.main.getCon(), c1, cg1);
-////       GestionBDinterface.createCategorie(this.main.getCon(), c2, cg1);
-       
+//      int cg1= GestionBDinterface.createCategorieGenerale(this.main.getCon(), "Puit");
+////       
+//       GestionBDinterface.createCategorie(this.main.getCon(), c18,cg1);
+//       GestionBDinterface.createCategorie(this.main.getCon(), c17, cg1);
+//       GestionBDinterface.createCategorie(this.main.getCon(), c16, cg1);        
+//       GestionBDinterface.createCategorie(this.main.getCon(), c15, cg1);        
+//GestionBDinterface.createCategorie(this.main.getCon(), c14, cg1);
+//       GestionBDinterface.createCategorie(this.main.getCon(), c13, cg1);
+//       GestionBDinterface.createCategorie(this.main.getCon(), c12, cg1);
+//       GestionBDinterface.createCategorie(this.main.getCon(), c11, cg1);
+//       GestionBDinterface.createCategorie(this.main.getCon(), c10, cg1);
+//       GestionBDinterface.createCategorie(this.main.getCon(), c9, cg1);
+//       GestionBDinterface.createCategorie(this.main.getCon(), c8, cg1);
+//       GestionBDinterface.createCategorie(this.main.getCon(), c7, cg1);
+//       GestionBDinterface.createCategorie(this.main.getCon(), c6, cg1);
+//       GestionBDinterface.createCategorie(this.main.getCon(), c5, cg1);
+//       GestionBDinterface.createCategorie(this.main.getCon(), c4, cg1);
+//       GestionBDinterface.createCategorie(this.main.getCon(), c3, cg1);
+//       GestionBDinterface.createCategorie(this.main.getCon(), c1, cg1);
+//       GestionBDinterface.createCategorie(this.main.getCon(), c2, cg1);
+//       
        
        this.cbcategorie=new ComboBox();
        
