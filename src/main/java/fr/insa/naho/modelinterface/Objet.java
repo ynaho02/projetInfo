@@ -22,8 +22,10 @@ public class Objet {
     private int categorie;
     private int max;
     private int montant;
+    private byte[] images;
     
-    public Objet(int id,String titre, String description, Timestamp debut, Timestamp fin, int prixbase, int proposepar, int categoriegenerale, int categorie, int max,int montant){
+    public Objet(int id,String titre, String description, Timestamp debut, Timestamp fin, int prixbase, int proposepar, 
+            int categoriegenerale, int categorie, int max,int montant,byte[] images){
         
        this.id=id;
        this.titre=titre;
@@ -36,7 +38,7 @@ public class Objet {
        this.categorie=categorie;
        this.max=max;
        this.montant=montant;
-       
+       this.images= images;
     }
 
     public int getId() {
@@ -83,6 +85,10 @@ public class Objet {
     }
      public int getMontant() {
         return montant;
+    }
+     
+     public byte[] getImages() {
+        return images;
     }
     @Override
     public String toString(){

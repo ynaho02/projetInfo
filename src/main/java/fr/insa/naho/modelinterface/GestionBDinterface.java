@@ -7,6 +7,10 @@ package fr.insa.naho.modelinterface;
 import fr.insa.naho.modelinterface.Enchere;
 import fr.insa.naho.modelinterface.Categoriegenerale;
 import fr.insa.naho.modelinterface.Categorie;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -16,6 +20,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import javax.swing.JFileChooser;
 
 /**
  *
@@ -38,7 +43,7 @@ public class GestionBDinterface {
 
     public static Connection defautConnect()
             throws ClassNotFoundException, SQLException {
-        return connectGeneralPostGres("localhost", 5439, "postgres", "postgres", "pass"); //Le port c'est du 5432 sur ordi perso et du 5439 sur ordi de l'école
+        return connectGeneralPostGres("localhost", 5432, "postgres", "postgres", "pass"); //Le port c'est du 5432 sur ordi perso et du 5439 sur ordi de l'école
         // donc si le port n'est pas changé modifie le!
     }
 
@@ -103,7 +108,8 @@ public class GestionBDinterface {
                     + "prixbase integer,"
                     + "proposepar integer,"
                     + "categoriegenerale integer,"
-                    + "categorie integer"
+                    + "categorie integer,"
+                    + "images Bytea"
                     + ")";
 
             st.executeUpdate(objet);
@@ -472,7 +478,7 @@ public class GestionBDinterface {
                 
                  Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("description"), rs.getTimestamp("debut"),
                         rs.getTimestamp("fin"), rs.getInt("prixbase"), rs.getInt("proposepar"), rs.getInt("categoriegenerale"),
-                        rs.getInt("categorie"),maxi,0);
+                        rs.getInt("categorie"),maxi,0,rs.getBytes("images"));
 
                 objets.add(objet);
 //                 for (int i = 0; i < objets.size(); i++) {
@@ -583,7 +589,8 @@ public class GestionBDinterface {
     public static class UtilisateurNexistePasException extends Exception {
     }
 
-    public static int createObjet(Connection con, String titre, String description, Timestamp debut, Timestamp fin, int prixbase, int proposepar, int categoriegenerale, int categorie)
+    public static int createObjet(Connection con, String titre, String description, Timestamp debut, 
+            Timestamp fin, int prixbase, int proposepar, int categoriegenerale, int categorie, byte[] images)
             throws SQLException, CategorieNexistePasException, CategorieGenNexistePasException, UtilisateurNexistePasException {
 //C'est pareil, c'est la première partie du processsus permettant d'ajouter un objet
         
@@ -591,7 +598,7 @@ public class GestionBDinterface {
 
         try ( PreparedStatement pst = con.prepareStatement(
                 """
-                insert into objet (titre,description,debut,fin,prixbase,proposepar,categoriegenerale,categorie) values (?,?,?,?,?,?,?,?)
+                insert into objet (titre,description,debut,fin,prixbase,proposepar,categoriegenerale,categorie,images) values (?,?,?,?,?,?,?,?,?")
                 """, PreparedStatement.RETURN_GENERATED_KEYS)) {
             pst.setString(1, titre);
             pst.setString(2, description);
@@ -601,6 +608,7 @@ public class GestionBDinterface {
             pst.setInt(6, proposepar);
             pst.setInt(7, categoriegenerale);
             pst.setInt(8, categorie);
+            pst.setBytes(9, images);
 
             pst.executeUpdate();
 
@@ -811,7 +819,7 @@ public class GestionBDinterface {
 
     public static void demandeObjet(Connection con, String titre, String description,
             int prixbase, int annee, int mois, int date, String Fin, String nomcatgen,
-            String nomcat, String emailuser)
+            String nomcat, String emailuser, byte[] images)
             throws Exception {
         ArrayList<Objet> objets = new ArrayList<>();
 
@@ -822,7 +830,7 @@ public class GestionBDinterface {
         int categorie = -1;
         int categoriegenerale = -1;
         int proposepar = -1;
-
+        images=null;
         try ( PreparedStatement chercheCatGen = con.prepareStatement(
                 //ici on récupère l'id de la cat correspondante
                 "select id from categoriegenerale where nom = ?")) {
@@ -878,9 +886,17 @@ public class GestionBDinterface {
             System.out.println(" l'utilisateur n'est pas reconnu, retournez dans le menu l'ajouter");
             throw new Error(ex);
         }
+        
+        try{ 
+            images = insererImage(con);
+
+            
+        }catch (IOException ex){
+            System.out.println(" "+ex.getMessage());
+        }
 
         try {
-            createObjet(con, titre, description, debut, fin, prixbase, proposepar, categoriegenerale, categorie);
+            createObjet(con, titre, description, debut, fin, prixbase, proposepar, categoriegenerale, categorie,images);
 
             System.out.println("Objet ajouté avec succès.");
         } catch (CategorieGenNexistePasException | CategorieNexistePasException | UtilisateurNexistePasException | SQLException ex) {
@@ -938,7 +954,8 @@ public class GestionBDinterface {
         con.setAutoCommit(false);
         try ( PreparedStatement searchobjet = con.prepareStatement(
                 """
-         select objet.id, titre, description, debut, fin, prixbase, categorie, categoriegenerale, proposepar
+         select objet.id, titre, description, debut, fin, prixbase, categorie, categoriegenerale, 
+                proposepar,images
                          from objet join categoriegenerale on objet.categoriegenerale = categoriegenerale.id
                          where categoriegenerale.nom = ?
                          order by titre asc
@@ -972,7 +989,7 @@ public class GestionBDinterface {
                 System.out.println("Le montant de l'enchère maximale est de :" + " " + maxi + " " + "euros");
                 Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("description"), rs.getTimestamp("debut"),
                         rs.getTimestamp("fin"), rs.getInt("prixbase"), rs.getInt("proposepar"), rs.getInt("categoriegenerale"),
-                        rs.getInt("categorie"),maxi,0);
+                        rs.getInt("categorie"),maxi,0,rs.getBytes("images"));
 
                 objets.add(objet);
 
@@ -1023,7 +1040,8 @@ public class GestionBDinterface {
         con.setAutoCommit(false);
         try ( PreparedStatement searchobjet = con.prepareStatement(
                 """
-         select objet.id, titre, description, debut, fin, prixbase, proposepar, categoriegenerale, categorie
+         select objet.id, titre, description, debut, fin, prixbase, proposepar, categoriegenerale, 
+                categorie,images
                          from objet join categorie on objet.categorie = categorie.id
                          where categorie.nom = ?
                          order by titre asc
@@ -1058,7 +1076,7 @@ public class GestionBDinterface {
                 
                 Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("description"), rs.getTimestamp("debut"),
                         rs.getTimestamp("fin"), rs.getInt("prixbase"), rs.getInt("proposepar"), rs.getInt("categoriegenerale"),
-                        rs.getInt("categorie"),maxi,0);
+                        rs.getInt("categorie"),maxi,0,rs.getBytes("images"));
 
                 objets.add(objet);
             }
@@ -1114,7 +1132,7 @@ public class GestionBDinterface {
                 System.out.println("Le montant de l'enchère maximale est de :" + " " + maxi + " " + "euros");
                  Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("description"), rs.getTimestamp("debut"),
                         rs.getTimestamp("fin"), rs.getInt("prixbase"), rs.getInt("proposepar"), rs.getInt("categoriegenerale"),
-                        rs.getInt("categorie"),maxi,0);
+                        rs.getInt("categorie"),maxi,0,rs.getBytes("images"));
                 objets.add(objet);
 
             }
@@ -1167,7 +1185,7 @@ public class GestionBDinterface {
                 
                  Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("description"), rs.getTimestamp("debut"),
                         rs.getTimestamp("fin"), rs.getInt("prixbase"), rs.getInt("proposepar"), rs.getInt("categoriegenerale"),
-                        rs.getInt("categorie"),maxi,0);
+                        rs.getInt("categorie"),maxi,0,rs.getBytes("images"));
                 objets.add(objet);
                 
             }
@@ -1188,7 +1206,8 @@ public class GestionBDinterface {
         con.setAutoCommit(false);
         try ( PreparedStatement searchobjett = con.prepareStatement(
                 """
-         select objet.id, titre, description, debut, fin, prixbase, categorie, categoriegenerale, proposepar 
+         select objet.id, titre, description, debut, fin, prixbase, categorie, categoriegenerale, 
+                proposepar,images 
                 from objet join utilisateur on objet.proposepar = utilisateur.id
                 where codepostal like ?
                          order by titre asc
@@ -1221,7 +1240,7 @@ public class GestionBDinterface {
                 System.out.println("Le montant de l'enchère maximale est de :" + " " + maxi + " " + "euros");
                  Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("description"), rs.getTimestamp("debut"),
                         rs.getTimestamp("fin"), rs.getInt("prixbase"), rs.getInt("proposepar"), rs.getInt("categoriegenerale"),
-                        rs.getInt("categorie"),maxi,0);
+                        rs.getInt("categorie"),maxi,0,rs.getBytes("images"));
 
                 objets.add(objet);
                 
@@ -1246,7 +1265,7 @@ public class GestionBDinterface {
                 """
                
                 select objet.id, prenom, titre, description, debut, fin, prixbase,proposepar,
-                categoriegenerale,categorie
+                categoriegenerale,categorie,images
                 from utilisateur,objet 
                 where utilisateur.id=objet.proposepar
                 and email=?
@@ -1282,7 +1301,7 @@ public class GestionBDinterface {
                  System.out.println("Le montant de l'enchère maximale est de :" + " " + maxi + " " + "euros");
                  Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("description"), rs.getTimestamp("debut"),
                         rs.getTimestamp("fin"), rs.getInt("prixbase"), rs.getInt("proposepar"), rs.getInt("categoriegenerale"),
-                        rs.getInt("categorie"),maxi,0);
+                        rs.getInt("categorie"),maxi,0,rs.getBytes("images"));
                 objets.add(objet);
 
             
@@ -1320,7 +1339,7 @@ public class GestionBDinterface {
                 """
                
                 select objet.id, titre,description, debut, fin, categorie, categoriegenerale, proposepar,
-                prixbase,montant
+                prixbase,montant,images
                 from utilisateur, objet, enchere 
                 where enchere.de = utilisateur.id and enchere.sur = objet.id
                 and email=?
@@ -1357,7 +1376,7 @@ public class GestionBDinterface {
                 System.out.println("Le montant de l'enchère maximale est de :" + " " + maxi + " " + "euros");
 Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("description"), rs.getTimestamp("debut"),
                         rs.getTimestamp("fin"), rs.getInt("prixbase"), rs.getInt("proposepar"), rs.getInt("categoriegenerale"),
-                        rs.getInt("categorie"),maxi,rs.getInt("montant"));
+                        rs.getInt("categorie"),maxi,rs.getInt("montant"),rs.getBytes("images"));
                 objets.add(objet);
 
             }
@@ -1881,36 +1900,36 @@ Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("de
             int c5 = createCategorie(con, "Voitures", cg3);
             int c6 = createCategorie(con, "Vélos", cg3);
 
-            int o1 = createObjet(con, "Lit en hauteur", "lit pratique, rouge, bien pour les enfants",
-                    new Timestamp(System.currentTimeMillis()),
-                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 48000 * 1000),
-                    20, u1, cg1, c1);
-            int o2 = createObjet(con, "Chaise en cuir", "chaise pratique, noire, siège chauffant",
-                    new Timestamp(System.currentTimeMillis()),
-                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 48000 * 1000),
-                    150, u2, cg1, c2);
-            int o3 = createObjet(con, "Pendentif soleil", "or plaqué, très joli",
-                    new Timestamp(System.currentTimeMillis()),
-                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 24000 * 1000),
-                    35, u3, cg2, c3);
-            int o4 = createObjet(con, "sac à dos", "marque quechua, gris, contient beaucoup d'espace",
-                    new Timestamp(System.currentTimeMillis()),
-                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 48000 * 1000),
-                    20, u4, cg2, c4);
-            int o5 = createObjet(con, "Peugeot 306", "vieille voiture, jaune orangé, encore en excellent état, petit bolide",
-                    new Timestamp(System.currentTimeMillis()),
-                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 72000 * 1000),
-                    1500, u1, cg3, c5);
-            int o6 = createObjet(con, "bicyclette", "rose avec un panier à l'avant" + "/n" + "Elle appartenait à Marilyn Monroe ",
-                    new Timestamp(System.currentTimeMillis()),
-                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 72000 * 1000),
-                    20, u1, cg1, c1);
-            createEnchere(con, new Timestamp(System.currentTimeMillis()), 30, o1, u2);
-            createEnchere(con, new Timestamp(System.currentTimeMillis()), 160, o2, u3);
-            createEnchere(con, new Timestamp(System.currentTimeMillis()), 40, o3, u4);
-            createEnchere(con, new Timestamp(System.currentTimeMillis()), 21, o4, u1);
-            createEnchere(con, new Timestamp(System.currentTimeMillis()), 1600, o5, u2);
-            createEnchere(con, new Timestamp(System.currentTimeMillis()), 25, o6, u3);
+//            int o1 = createObjet(con, "Lit en hauteur", "lit pratique, rouge, bien pour les enfants",
+////                    new Timestamp(System.currentTimeMillis()),
+//                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 48000 * 1000),
+//                    20, u1, cg1, c1);
+//            int o2 = createObjet(con, "Chaise en cuir", "chaise pratique, noire, siège chauffant",
+//                    new Timestamp(System.currentTimeMillis()),
+//                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 48000 * 1000),
+//                    150, u2, cg1, c2);
+//            int o3 = createObjet(con, "Pendentif soleil", "or plaqué, très joli",
+//                    new Timestamp(System.currentTimeMillis()),
+//                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 24000 * 1000),
+//                    35, u3, cg2, c3);
+//            int o4 = createObjet(con, "sac à dos", "marque quechua, gris, contient beaucoup d'espace",
+//                    new Timestamp(System.currentTimeMillis()),
+//                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 48000 * 1000),
+//                    20, u4, cg2, c4);
+//            int o5 = createObjet(con, "Peugeot 306", "vieille voiture, jaune orangé, encore en excellent état, petit bolide",
+//                    new Timestamp(System.currentTimeMillis()),
+//                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 72000 * 1000),
+//                    1500, u1, cg3, c5);
+//            int o6 = createObjet(con, "bicyclette", "rose avec un panier à l'avant" + "/n" + "Elle appartenait à Marilyn Monroe ",
+//                    new Timestamp(System.currentTimeMillis()),
+//                    new Timestamp(System.currentTimeMillis() + 60 * 60 * 72000 * 1000),
+//                    20, u1, cg1, c1);
+//            createEnchere(con, new Timestamp(System.currentTimeMillis()), 30, o1, u2);
+//            createEnchere(con, new Timestamp(System.currentTimeMillis()), 160, o2, u3);
+//            createEnchere(con, new Timestamp(System.currentTimeMillis()), 40, o3, u4);
+//            createEnchere(con, new Timestamp(System.currentTimeMillis()), 21, o4, u1);
+//            createEnchere(con, new Timestamp(System.currentTimeMillis()), 1600, o5, u2);
+//            createEnchere(con, new Timestamp(System.currentTimeMillis()), 25, o6, u3);
 
             System.out.println("Utilisateurs, Catégories, Objets et Enchères ajoutés avec succès");
 
@@ -1920,13 +1939,34 @@ Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("de
         }
 
     }
+    
+    public static byte[] insererImage(Connection con )throws SQLException, FileNotFoundException, IOException{
+     
+        JFileChooser filechooser = new JFileChooser();
+        byte[] imagesbytes = null;
+        int returnValue = filechooser.showOpenDialog(null);
+        
+        if (returnValue==JFileChooser.APPROVE_OPTION){
+            
+            File selectedFile= filechooser.getSelectedFile();
+            imagesbytes = new byte[(int) selectedFile.length()];
+            
+            if (imagesbytes!=null){
+                try ( FileInputStream fis = new FileInputStream(selectedFile)) {
+                    //fis.read(imagesbytes);
+                    imagesbytes= fis.readAllBytes();
+                }
+            }
+        }
+        return imagesbytes;
+    }
 
     public static void recreationbdd(Connection con) throws Exception {
         //efface et recrée la bdd mais ne permet pas d'ajouter d'enchère, il faudra le faire manuellement
         try {
             deleteSchema(con);
             creeSchema(con);
-            recreatebdd(con);
+            //recreatebdd(con);
         } catch (Exception ex) {
             System.out.println("Problème" + ex.getMessage());
         }
