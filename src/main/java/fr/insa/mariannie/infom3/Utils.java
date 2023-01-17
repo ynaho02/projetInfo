@@ -5,6 +5,13 @@
 package fr.insa.mariannie.infom3;
 
 import javafx.scene.control.Alert;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
 
 /**
  *
@@ -22,8 +29,19 @@ public class Utils {
     }
 
     static void showErrorInAlert(String pb, String localizedMessage) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Erreur");
+        alert.setHeaderText(localizedMessage);
+        alert.showAndWait();
     }
 
+        public static void addSimpleBorder(Region c) {
+        addSimpleBorder(c, Color.BLACK, BorderWidths.DEFAULT.getTop());
+    }
     
+    public static void addSimpleBorder(Region c,Color couleur,double epaisseur) {
+        c.setBorder(new Border(new BorderStroke(couleur,
+                BorderStrokeStyle.SOLID, CornerRadii.EMPTY,new BorderWidths(epaisseur))));
+    }
+
 }

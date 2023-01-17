@@ -18,6 +18,7 @@ import static fr.insa.naho.modelinterface.GestionBDinterface.demandeUpdateFin;
 import static fr.insa.naho.modelinterface.GestionBDinterface.login;
 import static fr.insa.naho.modelinterface.GestionBDinterface.mesObjets;
 import static fr.insa.naho.modelinterface.GestionBDinterface.mesObjetsVoulus;
+import static fr.insa.naho.modelinterface.GestionBDinterface.recreatebdd;
 import static fr.insa.naho.modelinterface.GestionBDinterface.recreationbdd;
 import static fr.insa.naho.modelinterface.GestionBDinterface.trouveObjetCat;
 import static fr.insa.naho.modelinterface.GestionBDinterface.trouveObjetCatGen;
@@ -42,8 +43,8 @@ public class MainAppinterface {
             System.out.println("connection réussie"); //si la connection est établie ca te l'affiche, si tu n'as rien c'est que non
             //GestionBDinterface.insererImage(con);
 
-//recreationbdd(con);
-            MenuTexte(con); //Toutes mes méthodes prennent au minimun une connection en entrée. Cette connection c'est celle qui t'aura été fournie après le défaut connect. Ca veut dire que toutes les méthodes dont tu te serviras auront forcément un impact sur la bdd 
+recreatebdd(con);
+            //MenuTexte(con); //Toutes mes méthodes prennent au minimun une connection en entrée. Cette connection c'est celle qui t'aura été fournie après le défaut connect. Ca veut dire que toutes les méthodes dont tu te serviras auront forcément un impact sur la bdd 
         } catch (Exception ex) {
             throw new Error(ex);
         }

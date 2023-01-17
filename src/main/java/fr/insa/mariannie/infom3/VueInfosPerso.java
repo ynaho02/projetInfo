@@ -6,12 +6,24 @@ package fr.insa.mariannie.infom3;
 
 
 import fr.insa.naho.modelinterface.GestionBDinterface;
+import fr.insa.naho.modelinterface.Objet;
+import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.geometry.Pos;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.image.Image;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 
 /**
  *
@@ -28,53 +40,119 @@ public class VueInfosPerso extends GridPane {
     
     public VueInfosPerso (MainPane main){
         
+         this.setStyle("-fx-color:white;-fx-font-size:14px;-fx-font-weight:bold");
+        
+        Image fondecran =getImage("ressources/fond4.jpg", 100, 100);
+        this.setBackground(new Background(new BackgroundImage(fondecran, 
+                BackgroundRepeat.SPACE, 
+                BackgroundRepeat.SPACE,
+                BackgroundPosition.CENTER,
+                BackgroundSize.DEFAULT)));
+            this.main=main;
+        
         this.main=main;
+        this.setVgap(8);
         
         this.mesenchères= new ToggleButton("Mes enchères");
+        mesenchères.setStyle("-fx-color:white;-fx-font-weight:bold");
+        this.mesenchères.setPrefWidth(120);
         this.mesobjets= new ToggleButton ("Mes objets");
+        mesobjets.setStyle("-fx-color:white;-fx-font-weight:bold");
+        this.mesobjets.setPrefWidth(120);
         this.retour= new RadioButton("Retour");
+        retour.setStyle("-fx-color:white;-fx-font-weight:bold");
+        this.retour.setPrefWidth(120);
         
-        this.add(this.mesobjets,2,0);
+        Region region= new Region();
+        Region region1= new Region();
+        
+        
+        VBox vb = new VBox(mesenchères,region,mesobjets,region1,retour);
+        Image fondecran5 =getImage("ressources/fond4.jpg", 100, 100);
+        vb.setBackground(new Background(new BackgroundImage(fondecran5, 
+                BackgroundRepeat.SPACE, 
+                BackgroundRepeat.SPACE,
+                BackgroundPosition.CENTER,
+                BackgroundSize.DEFAULT)));
+        
+        region.setPrefSize(10, 10);
+        region1.setPrefSize(10, 10);
+        
+        this.main.setRight(vb);
+       /* this.add(this.mesobjets,2,0);
         this.add(this.mesenchères, 3, 0);
         this.add(this.retour,10,0);
         this.setHgap(10);
-        this.setVgap(2);
+        this.setVgap(2);*/
         
+        
+       
         mesobjets.setOnAction((t) -> {
+            
+            
+         
             try{
-            GestionBDinterface.mesObjets(this.main.getCon(),this.main.getCurUserMail());
-            //this.main.setCenter(new VueGlobale(this.main));
-                   }catch (SQLException ex) {
-                Utils.showErrorInAlert("PB", ex.getLocalizedMessage());
-            
-            
-        }   catch (Exception ex) {
-                Logger.getLogger(VueInfosPerso.class.getName()).log(Level.SEVERE, null, ex);
+                ArrayList<Objet> objets   ;
+                objets=GestionBDinterface.mesObjets(this.main.getCon(),this.main.getCurUserMail());
+                
+                 
+                this.main.setCenter(new VueAnnonces(this.main, objets));
+                
+            } catch (Exception ex){
+                
             }
+            
+           
         
         
+        
+    
     });
     
         
         mesenchères.setOnAction((t) -> {
             
-           // try{
-               // String emailuser = this.main.getCurUserMail();
-           //  GestionBD.mesEncheres(this.main.getCon(), this.main.getCurUserMail());
-            //this.main.setCenter(new VueGlobale(this.main));   Si je le commente pas, alors va direct sur vue globae = PB! et montre pas enchères/objets
-       // }catch (SQLException ex) {
-               // Utils.showErrorInAlert("PB", ex.getLocalizedMessage());
-                this.main.setCenter(new VueGlobale(this.main)); // Si je le met ici il se passe rien
-        //}
+            try{
+                 ArrayList<Objet> objets   ;
+            
+    
+                objets= GestionBDinterface.mesObjetsVoulus(this.main.getCon(),this.main.getCurUserMail());
+                
+                this.main.setCenter(new VueAnnonces(this.main, objets));
+                        
+            }catch (Exception ex){
+                
+            }
+            
+            
+                        
             
                         
         });
         
         retour.setOnAction((t) -> {
             
-            this.main.setCenter(new VueGlobale(this.main));
+            try {
+                this.main.setCenter(new VueGlobale(this.main));
+            } catch (SQLException ex) {
+                Logger.getLogger(VueInfosPerso.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (GestionBDinterface.CategorieGenExisteDejaException ex) {
+                Logger.getLogger(VueInfosPerso.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (GestionBDinterface.CategorieExisteDejaException ex) {
+                Logger.getLogger(VueInfosPerso.class.getName()).log(Level.SEVERE, null, ex);
+            }
             
         });
   
+}
+    
+    private Image getImage(String resourcePath,int w,int h) {
+        InputStream input //
+                = this.getClass().getResourceAsStream(resourcePath);
+        Image image = new Image(input);
+        
+        image.widthProperty();
+        image.heightProperty();
+        return image;
 }
 }

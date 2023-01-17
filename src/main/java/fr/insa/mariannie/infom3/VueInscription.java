@@ -56,7 +56,7 @@ public class VueInscription extends GridPane {
   
 
     public VueInscription(MainPane main) {
-        //this.setStyle("-fx-color:white;-fx-font-size:18px;-fx-font-weight:bold");
+        this.setStyle("-fx-color:white;-fx-font-size:14px;-fx-font-weight:bold");
         
         Image fondecran =getImage("ressources/Inscription.jpg", 25, 25);
         this.setBackground(new Background(new BackgroundImage(fondecran, 
@@ -75,37 +75,37 @@ public class VueInscription extends GridPane {
         nom.setTextFill(Color.WHITE);
         nom.setStyle("-fx-font-size: 20;-fx-font-weight:bold");
         this.tfnom = new TextField("");
-        this.add(this.nom, 0, 1);
-        this.add(this.tfnom, 1, 1);
+        this.add(this.nom, 0, 3);
+        this.add(this.tfnom, 1, 3);
 
         this.prenom = new Label("Prénom:");
         this.tfprenom = new TextField();
         prenom.setTextFill(Color.WHITE);
         prenom.setStyle("-fx-font-size: 20;-fx-font-weight:bold");
-        this.add(this.prenom, 0, 2);
-        this.add(this.tfprenom,1, 2);
+        this.add(this.prenom, 0, 4);
+        this.add(this.tfprenom,1, 4);
         
         this.mail = new Label("Email:");
         this.tfmail = new TextField();
         mail.setTextFill(Color.WHITE);
         mail.setStyle("-fx-font-size: 20;-fx-font-weight:bold");
-        this.add(this.mail, 0, 3);
-        this.add(this.tfmail,1, 3);
+        this.add(this.mail, 0, 5);
+        this.add(this.tfmail,1, 5);
         
         this.codepostal = new Label("Code Postal:");
         this.tfcodepostal = new TextField();
         codepostal.setTextFill(Color.WHITE);
         codepostal.setStyle("-fx-font-size: 20;-fx-font-weight:bold");
-        this.add(this.codepostal, 0, 4);
-        this.add(this.tfcodepostal,1, 4);
+        this.add(this.codepostal, 0, 6);
+        this.add(this.tfcodepostal,1, 6);
         
 
         this.pass = new Label("Pass:");
         this.pfpass = new PasswordField();
         pass.setTextFill(Color.WHITE);
         pass.setStyle("-fx-font-size: 20;-fx-font-weight:bold");
-        this.add(this.pass, 0, 5);
-        this.add(this.pfpass, 1, 5);
+        this.add(this.pass, 0, 7);
+        this.add(this.pfpass, 1, 7);
 
         this.bienvenue = new Label(" Cher client, bienvenue!");
         this.add(this.bienvenue, 1, 0);
@@ -136,10 +136,10 @@ public class VueInscription extends GridPane {
             
         });
         
-        this.add(this.create, 1, 6);
+        this.add(this.create, 1, 8);
         
         this.login = new Button ("Login");
-        this.add(this.login,2, 6);
+        this.add(this.login,2, 8);
         this.login.setOnAction((t) -> {
             
             this.main.setCenter(new VueLogin(this.main));
