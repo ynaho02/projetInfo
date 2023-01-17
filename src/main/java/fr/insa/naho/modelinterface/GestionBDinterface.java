@@ -830,7 +830,6 @@ public class GestionBDinterface {
         int categorie = -1;
         int categoriegenerale = -1;
         int proposepar = -1;
-        images=null;
         try ( PreparedStatement chercheCatGen = con.prepareStatement(
                 //ici on récupère l'id de la cat correspondante
                 "select id from categoriegenerale where nom = ?")) {
@@ -1953,13 +1952,16 @@ Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("de
             imagesbytes = new byte[(int) selectedFile.length()];
             
             if (imagesbytes!=null){
-                try ( FileInputStream fis = new FileInputStream(selectedFile)) {
-                    //fis.read(imagesbytes);
-                    imagesbytes= fis.readAllBytes();
-                    System.out.println("3JFBFIUZEJRNGv      "+imagesbytes);
+                FileInputStream fis = new FileInputStream(selectedFile);
+                fis.read(imagesbytes);
+                fis.close();
+//                try ( FileInputStream fis = new FileInputStream(selectedFile)) {
+//                    //fis.read(imagesbytes);
+//                    imagesbytes= fis.readAllBytes();
+//                    System.out.println("3JFBFIUZEJRNGv      "+imagesbytes);
                 }
             }
-        }
+        
         return imagesbytes;
     }
 

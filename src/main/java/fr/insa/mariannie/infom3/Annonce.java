@@ -90,15 +90,15 @@ public class Annonce extends GridPane {
         this.add(this.bEnchere, 2, 10);
         
          byte[] imageBytes = obj.getImages();
-//           if (imageBytes !=null){
-//               
-//               Image image = new Image(new ByteArrayInputStream(imageBytes));
-//               ImageView imageview = new ImageView(image);
-//               imageview.setFitWidth(300); //fixer a 300 pixels
-//               imageview.setFitHeight(150);//fixer a 150 pixels
-//               imageview.setPreserveRatio(true); //conserver le ratio de l'image
-//               this.add(imageview,1,obj.getId());
-//           }
+           if (imageBytes !=null){
+               
+               Image image = new Image(new ByteArrayInputStream(imageBytes));
+               ImageView imageview = new ImageView(image);
+               imageview.setFitWidth(300); //fixer a 300 pixels
+               imageview.setFitHeight(150);//fixer a 150 pixels
+               imageview.setPreserveRatio(true); //conserver le ratio de l'image
+               this.add(imageview,3,5);
+           }
 
         this.bEnchere.setOnAction((t) -> {
             String mail = this.main.getCurUserMail();
