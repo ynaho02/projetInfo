@@ -97,7 +97,7 @@ public class Annonce extends GridPane {
                imageview.setFitWidth(300); //fixer a 300 pixels
                imageview.setFitHeight(150);//fixer a 150 pixels
                imageview.setPreserveRatio(true); //conserver le ratio de l'image
-               this.add(imageview,3,5);
+               this.add(imageview,3,3,1,6);
            }
 
         this.bEnchere.setOnAction((t) -> {
