@@ -43,7 +43,7 @@ public class GestionBDinterface {
 
     public static Connection defautConnect()
             throws ClassNotFoundException, SQLException {
-        return connectGeneralPostGres("localhost", 5432, "postgres", "postgres", "pass"); //Le port c'est du 5432 sur ordi perso et du 5439 sur ordi de l'école
+        return connectGeneralPostGres("localhost", 5439, "postgres", "postgres", "admin"); //Le port c'est du 5432 sur ordi perso et du 5439 sur ordi de l'école
         // donc si le port n'est pas changé modifie le!
     }
 
@@ -598,7 +598,7 @@ public class GestionBDinterface {
 
         try ( PreparedStatement pst = con.prepareStatement(
                 """
-                insert into objet (titre,description,debut,fin,prixbase,proposepar,categoriegenerale,categorie,images) values (?,?,?,?,?,?,?,?,?")
+                insert into objet (titre,description,debut,fin,prixbase,proposepar,categoriegenerale,categorie,images) values (?,?,?,?,?,?,?,?,?)
                 """, PreparedStatement.RETURN_GENERATED_KEYS)) {
             pst.setString(1, titre);
             pst.setString(2, description);
@@ -887,13 +887,13 @@ public class GestionBDinterface {
             throw new Error(ex);
         }
         
-        try{ 
-            images = insererImage(con);
-
-            
-        }catch (IOException ex){
-            System.out.println(" "+ex.getMessage());
-        }
+//        try{ 
+//            images = insererImage(con);
+//
+//            
+//        }catch (IOException ex){
+//            System.out.println(" "+ex.getMessage());
+//        }
 
         try {
             createObjet(con, titre, description, debut, fin, prixbase, proposepar, categoriegenerale, categorie,images);
@@ -1893,12 +1893,12 @@ Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("de
             int cg1 = createCategorieGenerale(con, "Meubles");
             int cg2 = createCategorieGenerale(con, "Accessoires");
             int cg3 = createCategorieGenerale(con, "Vehicules");
-            int c1 = createCategorie(con, "Lits", cg1);
-            int c2 = createCategorie(con, "Chaises", cg1);
-            int c3 = createCategorie(con, "Bijoux", cg2);
-            int c4 = createCategorie(con, "Sacs", cg2);
-            int c5 = createCategorie(con, "Voitures", cg3);
-            int c6 = createCategorie(con, "Vélos", cg3);
+//            int c1 = createCategorie(con, "Lits", cg1);
+//            int c2 = createCategorie(con, "Chaises", cg1);
+//            int c3 = createCategorie(con, "Bijoux", cg2);
+//            int c4 = createCategorie(con, "Sacs", cg2);
+//            int c5 = createCategorie(con, "Voitures", cg3);
+//            int c6 = createCategorie(con, "Vélos", cg3);
 
 //            int o1 = createObjet(con, "Lit en hauteur", "lit pratique, rouge, bien pour les enfants",
 ////                    new Timestamp(System.currentTimeMillis()),
@@ -1945,9 +1945,10 @@ Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("de
         JFileChooser filechooser = new JFileChooser();
         byte[] imagesbytes = null;
         int returnValue = filechooser.showOpenDialog(null);
-        
+        System.out.println("on vz entrer dzns boucle");
         if (returnValue==JFileChooser.APPROVE_OPTION){
-            
+                    System.out.println("on est entrer dzns boucle");
+
             File selectedFile= filechooser.getSelectedFile();
             imagesbytes = new byte[(int) selectedFile.length()];
             
@@ -1955,6 +1956,7 @@ Objet objet = new Objet(rs.getInt("id"), rs.getString("titre"), rs.getString("de
                 try ( FileInputStream fis = new FileInputStream(selectedFile)) {
                     //fis.read(imagesbytes);
                     imagesbytes= fis.readAllBytes();
+                    System.out.println("3JFBFIUZEJRNGv      "+imagesbytes);
                 }
             }
         }
